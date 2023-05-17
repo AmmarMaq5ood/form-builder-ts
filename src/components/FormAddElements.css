@@ -1,0 +1,73 @@
+/* .csd-select {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  vertical-align: middle;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.csd-select:focus-within {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.csd-select::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  border-width: 0.5rem 0.5rem 0;
+  border-style: solid;
+  border-color: #495057 transparent;
+  pointer-events: none;
+}
+
+select {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  vertical-align: middle;
+  background-color: transparent;
+  border: none;
+  appearance: none;
+}
+
+select:focus {
+  outline: 0;
+  box-shadow: none;
+}
+
+.csd-select .placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 1rem;
+  color: #6c757d;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+select:invalid ~ .placeholder {
+  color: #dc3545;
+}
+
+select:valid ~ .placeholder,
+select:focus ~ .placeholder {
+  display: none;
+} */
