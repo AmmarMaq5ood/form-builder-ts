@@ -10,8 +10,8 @@ import "./FormBuilder.css";
 
 type FormElementProps = {
   name: string;
-  placeholder: string;
-  inputType: string;
+  placeholder?: string;
+  input_type: string;
   options?: { label: string; value: string }[];
 };
 
@@ -25,13 +25,19 @@ const FormBuilderTS = () => {
   const [selectedElement, setSelectedElement] = useState<string>("");
 
   const handleAddElement = () => {
-    let newProps: FormElementProps = {
-      name: "",
-      placeholder: "",
-      inputType: "", // inputType should be initialized here
-    };
-    if (selectedElement === "select") {
-      newProps.options = [];
+    let newProps: FormElementProps;
+    if (["select", "radio"].includes(selectedElement)) {
+      newProps = {
+        name: "",
+        input_type: "",
+        options: [],
+      };
+    } else {
+      newProps = {
+        name: "",
+        placeholder: "",
+        input_type: "", 
+      };
     }
     const newElement: FormElement = { type: selectedElement, props: newProps };
     setElements([...elements, newElement]);
