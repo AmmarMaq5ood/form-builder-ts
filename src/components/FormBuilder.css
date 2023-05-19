@@ -1,15 +1,10 @@
 .formbuilder__container {
   height: 100vh;
   width: 100vw;
-  /* background-color:  red; */
 }
 .formbuilder__header h1 {
   padding: 10px;
 }
-/* .formbuilder__body{
-    display: flex;
-    flex-direction: row;
-}*/
 .formbuilder__preview {
   border-left: 1px solid black;
   display: flex;
@@ -23,7 +18,6 @@
 .formbuilder__body {
   display: flex;
   flex-direction: row;
-  /* justify-content: space-between; */
 }
 
 .formbuilder__form-elements {
