@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import FormAddElements from "./FormAddElementsTS";
 import FormElements from "./FormElementsTS";
 import FormPreview from "./FormPreviewTS";
@@ -75,12 +75,12 @@ const FormBuilderTS = () => {
   };
 
   const handleMoveElement = (dragIndex: number, hoverIndex: number) => {
-    const dragElement = elements[dragIndex]
-    const newElements = [...elements]
-    newElements.splice(dragIndex, 1)
-    newElements.splice(hoverIndex, 0, dragElement)
-    setElements(newElements)
-  }
+    const dragElement = elements[dragIndex];
+    const newElements = [...elements];
+    newElements.splice(dragIndex, 1);
+    newElements.splice(hoverIndex, 0, dragElement);
+    setElements(newElements);
+  };
 
   return (
     <DndProvider backend={HTML5Backend}>

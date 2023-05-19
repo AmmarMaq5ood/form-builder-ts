@@ -36,10 +36,14 @@ const FormElements: React.FC<FormElementsProps> = ({
 }) => {
 
   const ref = useRef<HTMLDivElement>(null)
+  // const dragRef = useRef<HTMLDivElement>(null);
 
-  const [, drag] = useDrag({
+  const [{isDragging}, drag] = useDrag({
     type: "formElement",
     item: { index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging()
+    })
   });
 
   const [, drop] = useDrop<Item, any, any>({
@@ -88,10 +92,13 @@ const FormElements: React.FC<FormElementsProps> = ({
     },
   })
 
-  drag(drop(ref))
+  // drag(dragRef)
+  drag(ref)
+  // preview(dragRef)
+  const opacity = isDragging ? 0.9 : 1;
 
   return (
-    <div ref={drag} key={index}>
+    <div ref={ref} key={index} style={{opacity}}>
       <div ref={drop}>
         <div key={index}>
           {element.type === "input" ? (
