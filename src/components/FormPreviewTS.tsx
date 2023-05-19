@@ -6,7 +6,7 @@ type FormPreviewProps = {
     type: string;
     props: {
       name: string;
-      placeholder: string;
+      placeholder?: string;
       options?: { label: string; value: string }[];
     };
   }[];
@@ -51,6 +51,23 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                     </option>
                   ))}
                 </select>
+              </>
+            )}
+            {element.type === "radio" && (
+              <>
+                <label htmlFor={element.props.name}>
+                  {element.props.name}:{" "}
+                </label>
+                {element.props.options?.map((option, index) => (
+                  <label key={index}>
+                    <input
+                      type="radio"
+                      name={element.props.name}
+                      value={option.value}
+                    />
+                    {option.label}
+                  </label>
+                ))}
               </>
             )}
           </div>

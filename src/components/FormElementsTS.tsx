@@ -1,6 +1,6 @@
-import React, {useRef} from "react";
+import React, { useRef } from "react";
 import "./FormElements.css";
-import { XYCoord } from 'dnd-core'
+import { XYCoord } from "dnd-core";
 
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
 
@@ -14,8 +14,8 @@ type FormElementsProps = {
     type: string;
     props: {
       name: string;
-      placeholder: string;
-      inputType: string;
+      placeholder?: string;
+      input_type: string;
       options?: { label: string; value: string }[];
     };
   };
@@ -34,65 +34,71 @@ const FormElements: React.FC<FormElementsProps> = ({
   handleRemoveOption,
   handleMoveElement,
 }) => {
+  const ref = useRef<HTMLDivElement>(null);
 
-  const ref = useRef<HTMLDivElement>(null)
-
-  const [{isDragging}, drag] = useDrag({
+  const [{ isDragging }, drag] = useDrag({
     type: "formElement",
     item: { index },
     collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    })
+      isDragging: monitor.isDragging(),
+    }),
   });
 
   const [, drop] = useDrop<Item, any, any>({
-    accept: 'formElement',
+    accept: "formElement",
     hover(item: { type: string; index: number }, monitor: DropTargetMonitor) {
       if (!ref.current) {
-        return
+        return;
       }
-      
-      const dragIndex = item.index
-      const hoverIndex = index
+
+      const dragIndex = item.index;
+      const hoverIndex = index;
 
       // Don't replace items with themselves
       if (dragIndex === hoverIndex) {
-        return
+        return;
       }
 
       // Determine rectangle on screen
-      const hoverBoundingRect = ref.current?.getBoundingClientRect()
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
 
       // Get vertical middle
-      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
       // Determine mouse position
-      const clientOffset = monitor.getClientOffset()
+      const clientOffset = monitor.getClientOffset();
 
       // Get pixels to the top
-      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
 
       // Only perform the move when the mouse has crossed half of the items height
       // When dragging downwards, only move when the cursor is below 50%
       // When dragging upwards, only move when the cursor is above 50%
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-        return
+        return;
       }
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-        return
+        return;
       }
-      
-      handleMoveElement(dragIndex, hoverIndex)
 
-      item.index = hoverIndex
+      handleMoveElement(dragIndex, hoverIndex);
+
+      item.index = hoverIndex;
     },
-  })
-
-  drag(ref)
-  const opacity = isDragging ? 0.9 : 1;
-
+  });
+  drag(ref);
+  console.log("ELEMENT PROPS: ", element.props);
   return (
-    <div ref={ref} key={index} style={{opacity}}>
+    <div
+      ref={ref}
+      key={index}
+      style={{
+        opacity: isDragging ? 0.1 : 1,
+        transform: `translate(0px, ${isDragging ? "-20px" : "0px"})`,
+        transition: "all 0.5s ease",
+      }}
+    >
       <div ref={drop}>
         <div key={index}>
           {element.type === "input" ? (
@@ -101,6 +107,8 @@ const FormElements: React.FC<FormElementsProps> = ({
             <h3>Textarea</h3>
           ) : element.type === "select" ? (
             <h3>Select</h3>
+          ) : element.type === "radio" ? (
+            <h3>Radio</h3>
           ) : null}
           <div
             key={index}
@@ -144,30 +152,33 @@ const FormElements: React.FC<FormElementsProps> = ({
                 }
               />
             </label>
-            <label style={{ fontWeight: "bolder" }}>
-              Placeholder:
-              <input
-                className="csd-input"
-                type="text"
-                value={element.props.placeholder}
-                onChange={(e) =>
-                  handlePropsChange(index, {
-                    ...element.props,
-                    placeholder: e.target.value,
-                  })
-                }
-              />
-            </label>
+            {element.props.options ? null : (
+              <label style={{ fontWeight: "bolder" }}>
+                Placeholder:
+                <input
+                  className="csd-input"
+                  type="text"
+                  value={element.props.placeholder}
+                  onChange={(e) =>
+                    handlePropsChange(index, {
+                      ...element.props,
+                      placeholder: e.target.value,
+                    })
+                  }
+                />
+              </label>
+            )}
+
             {element.type === "input" && (
               <label style={{ fontWeight: "bolder" }}>
                 Input Type:
                 <select
                   style={{ borderRadius: 20, padding: 5, marginLeft: 5 }}
-                  value={element.props.inputType}
+                  value={element.props.input_type}
                   onChange={(e) =>
                     handlePropsChange(index, {
                       ...element.props,
-                      inputType: e.target.value,
+                      input_type: e.target.value,
                     })
                   }
                 >
@@ -178,7 +189,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                 </select>
               </label>
             )}
-            {element.type === "select" && (
+            {element.type === "select" || element.type === "radio" ? (
               <div>
                 {element.props.options?.map((option, optionIndex) => (
                   <div key={optionIndex}>
@@ -241,7 +252,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                   Add
                 </button>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
