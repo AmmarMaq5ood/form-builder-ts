@@ -29,6 +29,7 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
         <option value="input">Input</option>
         <option value="textarea">Textarea</option>
         <option value="select">Select</option>
+        <option value="radio">Radio</option>
       </select>
       {selectedElement === "" ? (
         <button disabled onClick={handleAddElement}>
