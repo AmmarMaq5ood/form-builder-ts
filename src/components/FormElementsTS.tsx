@@ -36,7 +36,6 @@ const FormElements: React.FC<FormElementsProps> = ({
 }) => {
 
   const ref = useRef<HTMLDivElement>(null)
-  // const dragRef = useRef<HTMLDivElement>(null);
 
   const [{isDragging}, drag] = useDrag({
     type: "formElement",
@@ -82,19 +81,14 @@ const FormElements: React.FC<FormElementsProps> = ({
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
         return
       }
-
-      // Implement your own logic to update the list/order in your state (useState)
-      // Here I'm just calling a prop function handleMoveElement
-
-      handleMoveElement(dragIndex, hoverIndex) // You need to implement this function in the FormBuilderTS component
+      
+      handleMoveElement(dragIndex, hoverIndex)
 
       item.index = hoverIndex
     },
   })
 
-  // drag(dragRef)
   drag(ref)
-  // preview(dragRef)
   const opacity = isDragging ? 0.9 : 1;
 
   return (
