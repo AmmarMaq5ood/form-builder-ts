@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import "./FormElements.css";
 import { XYCoord } from "dnd-core";
+import {Input} from "@cloudscape-design/components"
 
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
 
@@ -54,27 +55,19 @@ const FormElements: React.FC<FormElementsProps> = ({
       const dragIndex = item.index;
       const hoverIndex = index;
 
-      // Don't replace items with themselves
       if (dragIndex === hoverIndex) {
         return;
       }
 
-      // Determine rectangle on screen
       const hoverBoundingRect = ref.current?.getBoundingClientRect();
 
-      // Get vertical middle
       const hoverMiddleY =
         (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
-      // Determine mouse position
       const clientOffset = monitor.getClientOffset();
 
-      // Get pixels to the top
       const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
 
-      // Only perform the move when the mouse has crossed half of the items height
-      // When dragging downwards, only move when the cursor is below 50%
-      // When dragging upwards, only move when the cursor is above 50%
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
         return;
       }
@@ -88,7 +81,6 @@ const FormElements: React.FC<FormElementsProps> = ({
     },
   });
   drag(ref);
-  console.log("ELEMENT PROPS: ", element.props);
   return (
     <div
       ref={ref}
@@ -110,44 +102,22 @@ const FormElements: React.FC<FormElementsProps> = ({
           ) : element.type === "radio" ? (
             <h3>Radio</h3>
           ) : null}
-          <div
-            key={index}
-            style={{
-              flex: 1,
-              width: "100%",
-              border: "1px solid whitesmoke",
-              backgroundColor: "whitesmoke",
-              borderRadius: 5,
-              padding: 20,
-              marginBottom: 20,
-              position: "relative",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
+          <div key={index} className="form_element_card">
             <button
               onClick={() => handleRemoveElement(index)}
-              style={{
-                position: "absolute",
-                top: 2,
-                right: 2,
-                borderRadius: 100,
-                padding: 3,
-                cursor: "pointer",
-              }}
+              className="form_element_close"
             >
               ❌
             </button>
             <label style={{ fontWeight: "bolder" }}>
               Name:{" "}
-              <input
-                className="csd-input"
+              <Input
                 type="text"
                 value={element.props.name}
-                onChange={(e) =>
+                onChange={({detail}) =>
                   handlePropsChange(index, {
                     ...element.props,
-                    name: e.target.value,
+                    name: detail.value,
                   })
                 }
               />
@@ -155,14 +125,13 @@ const FormElements: React.FC<FormElementsProps> = ({
             {element.props.options ? null : (
               <label style={{ fontWeight: "bolder" }}>
                 Placeholder:
-                <input
-                  className="csd-input"
+                <Input
                   type="text"
-                  value={element.props.placeholder}
-                  onChange={(e) =>
+                  value={element.props?.placeholder!}
+                  onChange={({detail}) =>
                     handlePropsChange(index, {
                       ...element.props,
-                      placeholder: e.target.value,
+                      placeholder: detail.value,
                     })
                   }
                 />
@@ -173,7 +142,6 @@ const FormElements: React.FC<FormElementsProps> = ({
               <label style={{ fontWeight: "bolder" }}>
                 Input Type:
                 <select
-                  style={{ borderRadius: 20, padding: 5, marginLeft: 5 }}
                   value={element.props.input_type}
                   onChange={(e) =>
                     handlePropsChange(index, {

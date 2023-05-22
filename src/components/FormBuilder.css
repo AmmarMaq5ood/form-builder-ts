@@ -3,7 +3,9 @@
   width: 100vw;
 }
 .formbuilder__header h1 {
-  padding: 10px;
+  text-align: center;
+  border-bottom: 3px solid black;
+  margin-bottom: 20px;
 }
 .formbuilder__preview {
   border-left: 1px solid black;

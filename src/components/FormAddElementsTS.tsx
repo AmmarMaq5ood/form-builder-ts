@@ -13,12 +13,9 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
   setSelectedElement,
   handleAddElement,
 }) => {
-  // remaining code...
   return (
     <div>
       <select
-        className="csd-select"
-        style={{ borderRadius: 20, padding: 10, marginRight: 5 }}
         value={selectedElement}
         onChange={(e) => {
           console.log(`Selected Element is: ${e.target.value}`);

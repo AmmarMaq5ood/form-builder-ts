@@ -1,3 +1,25 @@
+.form_element_card {
+  flex: 1;
+  width: 100%;
+  border: 1px solid whitesmoke;
+  background-color: whitesmoke;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.form_element_close {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  border-radius: 100px;
+  padding: 3px;
+  cursor: po;
+}
+
 .csd-input {
   display: flex;
   flex-direction: column;

@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import "./FormPreview.css";
+import { Input, InputProps, Textarea } from "@cloudscape-design/components";
 
 type FormPreviewProps = {
   elements: {
@@ -7,6 +8,7 @@ type FormPreviewProps = {
     props: {
       name: string;
       placeholder?: string;
+      input_type?: string;
       options?: { label: string; value: string }[];
     };
   }[];
@@ -17,7 +19,8 @@ const FormPreview: React.FC<FormPreviewProps> = ({
   elements,
   handleSubmit,
 }) => {
-  // remaining code...
+  const [inputValue, setInputValue] = useState("");
+  const [textareaValue, setTextareaValue] = useState("");
   return (
     <div className="form-preview">
       <form onSubmit={handleSubmit}>
@@ -28,7 +31,13 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                 <label htmlFor={element.props.name}>
                   {element.props.name}:{" "}
                 </label>
-                <input {...element.props} />
+                <Input
+                  name={element.props.name}
+                  placeholder={element.props.placeholder}
+                  type={(element.props.input_type as InputProps.Type) || "text"}
+                  value={inputValue}
+                  onChange={({ detail }) => setInputValue(detail.value)}
+                />
               </>
             )}
             {element.type === "textarea" && (
@@ -36,14 +45,21 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                 <label htmlFor={element.props.name}>
                   {element.props.name}:{" "}
                 </label>
-                <textarea {...element.props} />
+                <Textarea
+                  name={element.props.name}
+                  placeholder={element.props.placeholder}
+                  value={textareaValue}
+                  onChange={({ detail }) => setTextareaValue(detail.value)}
+                />
               </>
             )}
             {element.type === "select" && (
               <>
-                <label htmlFor={element.props.name}>
-                  {element.props.name}:{" "}
-                </label>
+                <div>
+                  <label htmlFor={element.props.name}>
+                    {element.props.name}:{" "}
+                  </label>
+                </div>
                 <select {...element.props}>
                   {element.props.options?.map((option, index) => (
                     <option key={index} value={option.value}>
@@ -55,17 +71,23 @@ const FormPreview: React.FC<FormPreviewProps> = ({
             )}
             {element.type === "radio" && (
               <>
-                <label htmlFor={element.props.name}>
+                <label
+                  style={{ fontWeight: "bolder" }}
+                  htmlFor={element.props.name}
+                >
                   {element.props.name}:{" "}
                 </label>
                 {element.props.options?.map((option, index) => (
                   <label key={index}>
-                    <input
-                      type="radio"
-                      name={element.props.name}
-                      value={option.value}
-                    />
-                    {option.label}
+                    <div>
+                      <input
+                        style={{ fontWeight: 100 }}
+                        type="radio"
+                        name={element.props.name}
+                        value={option.value}
+                      />
+                      {option.label}
+                    </div>
                   </label>
                 ))}
               </>

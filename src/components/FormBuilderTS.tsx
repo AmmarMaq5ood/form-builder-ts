@@ -36,7 +36,7 @@ const FormBuilderTS = () => {
       newProps = {
         name: "",
         placeholder: "",
-        input_type: "", 
+        input_type: "",
       };
     }
     const newElement: FormElement = { type: selectedElement, props: newProps };
@@ -92,15 +92,7 @@ const FormBuilderTS = () => {
     <DndProvider backend={HTML5Backend}>
       <div className="formbuilder__container">
         <div className="formbuilder__header">
-          <h1
-            style={{
-              textAlign: "center",
-              borderBottom: "3px solid black",
-              marginBottom: 20,
-            }}
-          >
-            Form Builder
-          </h1>
+          <h1>Form Builder</h1>
         </div>
         <div className="formbuilder__body">
           <div className="formbuilder__form-elements">
