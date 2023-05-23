@@ -16,7 +16,7 @@ type FormElementsProps = {
     props: {
       name: string;
       placeholder?: string;
-      input_type: string;
+      input_type?: string;
       options?: { label: string; value: string }[];
     };
   };
