@@ -34,16 +34,15 @@ label {
 
 input {
   padding: 0.5rem;
-  border: 3px solid #d2d6dc;
-  border-radius: 1rem;
+  border: 2px solid #d2d6dc;
+  border-radius: 5px;
   font-size: 1rem;
   line-height: 1.5rem;
 }
 
 input:focus {
   outline: none;
-  /* box-shadow: 0 0 0 1px rgba(164, 202, 254, 0.45); */
-  border-color: #a4cafe;
+  border-color: #4a80cd;
 }
 
 input::placeholder {
