@@ -64,6 +64,14 @@ const FormPreview: React.FC<FormPreviewProps> = ({
     handleInputChange(name, value);
   };
 
+  const handleRadioChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const value = event.target.value;
+    handleInputChange(name, value);
+  };
+
   return (
     <div className="form-preview">
       <form onSubmit={handleSubmit}>
@@ -122,28 +130,32 @@ const FormPreview: React.FC<FormPreviewProps> = ({
               </>
             )}
             {element.type === "radio" && (
-              <>
-                <label
-                  style={{ fontWeight: "bolder" }}
-                  htmlFor={element.props.name}
-                >
-                  {element.props.name}:{" "}
+            <>
+              <label
+                style={{ fontWeight: "bolder" }}
+                htmlFor={element.props.name}
+              >
+                {element.props.name}:{" "}
+              </label>
+              {element.props.options?.map((option, index) => (
+                <label key={index}>
+                  <div>
+                    <input
+                      style={{ fontWeight: 100 }}
+                      type="radio"
+                      name={element.props.name}
+                      value={option.value}
+                      checked={inputValues[element.props.name] === option.value}
+                      onChange={(event) =>
+                        handleRadioChange(event, element.props.name)
+                      }
+                    />
+                    {option.label}
+                  </div>
                 </label>
-                {element.props.options?.map((option, index) => (
-                  <label key={index}>
-                    <div>
-                      <input
-                        style={{ fontWeight: 100 }}
-                        type="radio"
-                        name={element.props.name}
-                        value={option.value}
-                      />
-                      {option.label}
-                    </div>
-                  </label>
-                ))}
-              </>
-            )}
+              ))}
+            </>
+          )}
           </div>
         ))}
         {elements.length ? (
