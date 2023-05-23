@@ -11,7 +11,7 @@ import "./FormBuilder.css";
 type FormElementProps = {
   name: string;
   placeholder?: string;
-  input_type: string;
+  input_type?: string;
   options?: { label: string; value: string }[];
 };
 
@@ -29,14 +29,18 @@ const FormBuilderTS = () => {
     if (["select", "radio"].includes(selectedElement)) {
       newProps = {
         name: "",
-        input_type: "",
         options: [],
+      };
+    } else if (selectedElement === "input") {
+      newProps = {
+        name: "",
+        placeholder: "",
+        input_type: "",
       };
     } else {
       newProps = {
         name: "",
         placeholder: "",
-        input_type: "",
       };
     }
     const newElement: FormElement = { type: selectedElement, props: newProps };
@@ -88,6 +92,10 @@ const FormBuilderTS = () => {
     setElements(newElements);
   };
 
+  const updateElements = (newElements: FormElement[]) => {
+    setElements(newElements);
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="formbuilder__container">
@@ -115,7 +123,11 @@ const FormBuilderTS = () => {
           </div>
           <div className="formbuilder__preview">
             <h2>Preview</h2>
-            <FormPreview elements={elements} handleSubmit={handleSubmit} />
+            <FormPreview
+              elements={elements}
+              handleSubmit={handleSubmit}
+              updateElements={updateElements}
+            />
           </div>
         </div>
       </div>
