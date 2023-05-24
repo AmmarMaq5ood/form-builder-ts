@@ -27,7 +27,7 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
         <option value="textarea">Textarea</option>
         <option value="select">Select</option>
         <option value="radio">Radio</option>
-        <option value="checkbox">checkbox</option>
+        <option value="checkbox">Checkbox</option>
       </select>
       {selectedElement === "" ? (
         <button disabled onClick={handleAddElement}>
