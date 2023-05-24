@@ -26,7 +26,7 @@ const FormBuilderTS = () => {
 
   const handleAddElement = () => {
     let newProps: FormElementProps;
-    if (["select", "radio"].includes(selectedElement)) {
+    if (["select", "radio", "checkbox"].includes(selectedElement)) {
       newProps = {
         name: "",
         options: [],

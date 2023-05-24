@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import "./FormElements.css";
 import { XYCoord } from "dnd-core";
-import {Input} from "@cloudscape-design/components"
+import { Input } from "@cloudscape-design/components";
 
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
 
@@ -114,7 +114,7 @@ const FormElements: React.FC<FormElementsProps> = ({
               <Input
                 type="text"
                 value={element.props.name}
-                onChange={({detail}) =>
+                onChange={({ detail }) =>
                   handlePropsChange(index, {
                     ...element.props,
                     name: detail.value,
@@ -128,7 +128,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                 <Input
                   type="text"
                   value={element.props?.placeholder!}
-                  onChange={({detail}) =>
+                  onChange={({ detail }) =>
                     handlePropsChange(index, {
                       ...element.props,
                       placeholder: detail.value,
@@ -221,6 +221,70 @@ const FormElements: React.FC<FormElementsProps> = ({
                 </button>
               </div>
             ) : null}
+            {element.type === "checkbox" && (
+              <div>
+                {element.props.options?.map((option, optionIndex) => (
+                  <div key={optionIndex}>
+                    <label>
+                      Label:
+                      <input
+                        className="csd-input"
+                        type="text"
+                        value={option.label}
+                        onChange={(e) => {
+                          const newOptions = [...element.props.options!];
+                          newOptions[optionIndex] = {
+                            ...option,
+                            label: e.target.value,
+                          };
+                          handlePropsChange(index, {
+                            ...element.props,
+                            options: newOptions,
+                          });
+                        }}
+                      />
+                    </label>
+                    <label>
+                      Value:
+                      <input
+                        className="csd-input"
+                        type="text"
+                        value={option.value}
+                        onChange={(e) => {
+                          const newOptions = [...element.props.options!];
+                          newOptions[optionIndex] = {
+                            ...option,
+                            value: e.target.value,
+                          };
+                          handlePropsChange(index, {
+                            ...element.props,
+                            options: newOptions,
+                          });
+                        }}
+                      />
+                      <button
+                        onClick={() => handleRemoveOption(index, optionIndex)}
+                      >
+                        Remove
+                      </button>
+                    </label>
+                  </div>
+                ))}
+                <button
+                  onClick={() =>
+                    handlePropsChange(index, {
+                      ...element.props,
+                      options: [
+                        ...element.props.options!,
+                        { label: "", value: "" },
+                      ],
+                    })
+                  }
+                >
+                  Add
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

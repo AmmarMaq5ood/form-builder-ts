@@ -23,7 +23,10 @@ const FormPreview: React.FC<FormPreviewProps> = ({
   handleSubmit,
   updateElements,
 }) => {
-  const [inputValues, setInputValues] = useState<Record<string, string>>({});
+  const [inputValues, setInputValues] = useState<
+    Record<string, string | string[]>
+  >({});
+  // const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const saveForm = () => {
@@ -52,7 +55,7 @@ const FormPreview: React.FC<FormPreviewProps> = ({
     }
   };
 
-  const handleInputChange = (name: string, value: string) => {
+  const handleInputChange = (name: string, value: string | string[]) => {
     setInputValues((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -86,7 +89,7 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                   name={element.props.name}
                   placeholder={element.props.placeholder}
                   type={(element.props.input_type as InputProps.Type) || "text"}
-                  value={inputValues[element.props.name] || ""}
+                  value={(inputValues[element.props.name] as string) || ""}
                   onChange={({ detail }) =>
                     handleInputChange(element.props.name, detail.value)
                   }
@@ -101,7 +104,7 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                 <Textarea
                   name={element.props.name}
                   placeholder={element.props.placeholder}
-                  value={inputValues[element.props.name] || ""}
+                  value={(inputValues[element.props.name] as string) || ""}
                   onChange={({ detail }) =>
                     handleInputChange(element.props.name, detail.value)
                   }
@@ -130,32 +133,87 @@ const FormPreview: React.FC<FormPreviewProps> = ({
               </>
             )}
             {element.type === "radio" && (
-            <>
-              <label
-                style={{ fontWeight: "bolder" }}
-                htmlFor={element.props.name}
-              >
-                {element.props.name}:{" "}
-              </label>
-              {element.props.options?.map((option, index) => (
-                <label key={index}>
-                  <div>
-                    <input
-                      style={{ fontWeight: 100 }}
-                      type="radio"
-                      name={element.props.name}
-                      value={option.value}
-                      checked={inputValues[element.props.name] === option.value}
-                      onChange={(event) =>
-                        handleRadioChange(event, element.props.name)
-                      }
-                    />
-                    {option.label}
-                  </div>
+              <>
+                <label
+                  style={{ fontWeight: "bolder" }}
+                  htmlFor={element.props.name}
+                >
+                  {element.props.name}:{" "}
                 </label>
-              ))}
-            </>
-          )}
+                {element.props.options?.map((option, index) => (
+                  <label key={index}>
+                    <div>
+                      <input
+                        style={{ fontWeight: 100 }}
+                        type="radio"
+                        name={element.props.name}
+                        value={option.value}
+                        checked={
+                          inputValues[element.props.name] === option.value
+                        }
+                        onChange={(event) =>
+                          handleRadioChange(event, element.props.name)
+                        }
+                      />
+                      {option.label}
+                    </div>
+                  </label>
+                ))}
+              </>
+            )}
+            {element.type === "checkbox" && (
+              <>
+                <label
+                  style={{ fontWeight: "bolder" }}
+                  htmlFor={element.props.name}
+                >
+                  {element.props.name}:{" "}
+                </label>
+                <div>
+                  {element.props.options?.map((option, index) => (
+                    <div key={index}>
+                      <label>
+                        <input
+                          style={{ marginRight: "5px" }}
+                          type="checkbox"
+                          name={element.props.name}
+                          value={option.value}
+                          checked={
+                            Array.isArray(inputValues[element.props.name]) &&
+                            (
+                              inputValues[element.props.name] as string[]
+                            ).includes(option.value)
+                          }
+                          onChange={(event) => {
+                            const selectedValues =
+                              inputValues[element.props.name] || [];
+                            const checkedValue = event.target.value;
+                            let updatedValues: string[];
+
+                            if (event.target.checked) {
+                              updatedValues = [
+                                ...(selectedValues as string[]),
+                                checkedValue,
+                              ];
+                            } else {
+                              updatedValues = (
+                                selectedValues as string[]
+                              ).filter((value) => value !== checkedValue);
+                            }
+
+                            handleInputChange(
+                              element.props.name,
+                              updatedValues
+                            );
+                          }}
+                        />
+                        {option.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         ))}
         {elements.length ? (
