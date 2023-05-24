@@ -26,6 +26,7 @@ const FormPreview: React.FC<FormPreviewProps> = ({
   const [inputValues, setInputValues] = useState<
     Record<string, string | string[]>
   >({});
+  const [formName, setFormName] = useState("");
   // const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -37,7 +38,8 @@ const FormPreview: React.FC<FormPreviewProps> = ({
     const blob = new Blob([JSON.stringify(dataToSave)], {
       type: "application/json;charset=utf-8",
     });
-    FileSaver.saveAs(blob, "form.json");
+    let saveFormName = formName + ".json";
+    FileSaver.saveAs(blob, saveFormName);
   };
 
   const loadForm = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +80,16 @@ const FormPreview: React.FC<FormPreviewProps> = ({
   return (
     <div className="form-preview">
       <form onSubmit={handleSubmit}>
+        {elements.length ? (
+          <>
+            <label htmlFor="formName">Enter Form Name:</label>{" "}
+            <Input
+              name="formName"
+              value={formName}
+              onChange={({ detail }) => setFormName(detail.value)}
+            />
+          </>
+        ) : null}
         {elements.map((element, index) => (
           <div key={index}>
             {element.type === "input" && (
