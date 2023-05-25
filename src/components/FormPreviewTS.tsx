@@ -26,7 +26,6 @@ const FormPreview: React.FC<FormPreviewProps> = ({
   const [inputValues, setInputValues] = useState<
     Record<string, string | string[]>
   >({});
-  const [formName, setFormName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const saveForm = () => {
@@ -39,8 +38,8 @@ const FormPreview: React.FC<FormPreviewProps> = ({
     });
     
     let saveFormName = "";
-    if (formName !== "") {
-      saveFormName = formName + ".json";
+    if (inputValues && inputValues.formName) {
+      saveFormName = inputValues.formName.toString() + ".json";
     } else {
       saveFormName = "form.json";
     }
@@ -90,8 +89,8 @@ const FormPreview: React.FC<FormPreviewProps> = ({
             <label htmlFor="formName">Form Name:</label>{" "}
             <Input
               name="formName"
-              value={formName}
-              onChange={({ detail }) => setFormName(detail.value)}
+              value={inputValues['formName'] as string || ""}
+              onChange={({ detail }) => handleInputChange("formName" ,detail.value)}
             />
           </>
         ) : null}

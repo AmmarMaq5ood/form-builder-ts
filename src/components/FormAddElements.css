@@ -1,14 +1,22 @@
 select {
-  padding: 8px;
+  padding: 5px;
   font-size: 14px;
   border: 2px solid #000;
   border-radius: 4px;
   background-color: #fff;
   color: #333;
   width: 200px;
+  margin: 5px;
 }
 
 /* Styling for select options */
 select option {
-  padding: 8px;
+  padding: 5px;
+}
+
+button {
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
 }

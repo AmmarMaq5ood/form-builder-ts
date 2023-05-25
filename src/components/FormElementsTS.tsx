@@ -101,6 +101,8 @@ const FormElements: React.FC<FormElementsProps> = ({
             <h3>Select</h3>
           ) : element.type === "radio" ? (
             <h3>Radio</h3>
+          ) : element.type === "checkbox" ? (
+            <h3>CheckBox</h3>
           ) : null}
           <div key={index} className="form_element_card">
             <button
