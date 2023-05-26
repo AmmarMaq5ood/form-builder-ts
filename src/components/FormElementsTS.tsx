@@ -98,6 +98,8 @@ const FormElements: React.FC<FormElementsProps> = ({
             <h3>Radio</h3>
           ) : element.type === "checkbox" ? (
             <h3>CheckBox</h3>
+          ) :element.type === "datetime-local" ? (
+            <h3>Datetime</h3>
           ) : null}
           <div key={index} className="form_element_card">
             <img
@@ -119,7 +121,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                 }
               />
             </label>
-            {element.props.options ? null : (
+            {element.props.options || element.type === "datetime-local" ? null : (
               <label className="form_element_label">
                 Placeholder:
                 <Input

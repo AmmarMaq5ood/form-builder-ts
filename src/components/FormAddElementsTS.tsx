@@ -29,6 +29,7 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
         <option value="select">Select</option>
         <option value="radio">Radio</option>
         <option value="checkbox">Checkbox</option>
+        <option value="datetime-local">Datetime</option>
       </select>
       {selectedElement === "" ? (
         <button className="add_elements_btn" disabled onClick={handleAddElement}>

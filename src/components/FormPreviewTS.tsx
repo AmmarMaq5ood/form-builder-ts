@@ -141,9 +141,7 @@ const FormPreview: React.FC<FormPreviewProps> = ({
             )}
             {element.type === "radio" && (
               <>
-                <label
-                  htmlFor={element.props.name}
-                >
+                <label htmlFor={element.props.name}>
                   {element.props.name}:{" "}
                 </label>
                 {element.props.options?.map((option, index) => (
@@ -168,9 +166,7 @@ const FormPreview: React.FC<FormPreviewProps> = ({
             )}
             {element.type === "checkbox" && (
               <>
-                <label
-                  htmlFor={element.props.name}
-                >
+                <label htmlFor={element.props.name}>
                   {element.props.name}:{" "}
                 </label>
                 <div>
@@ -217,6 +213,26 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                 </div>
               </>
             )}
+            {element.type === "datetime-local" && (
+              <div>
+                <label htmlFor={element.props.name}>
+                  {element.props.name}:
+                  <div>
+                    <input
+                      type="datetime-local"
+                      name={element.props.name}
+                      value={(inputValues[element.props.name] as string) || ""}
+                      onChange={(event) =>
+                        handleInputChange(
+                          element.props.name,
+                          event.target.value
+                        )
+                      }
+                    />
+                  </div>
+                </label>
+              </div>
+            )}
           </div>
         ))}
         {elements.length ? (
@@ -231,11 +247,7 @@ const FormPreview: React.FC<FormPreviewProps> = ({
             />
             <div className="form_preview_btn_container">
               <button onClick={saveForm}>Save to JSON</button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={loadForm}
-              />
+              <input type="file" ref={fileInputRef} onChange={loadForm} />
               <button onClick={() => fileInputRef.current?.click()}>
                 Load Form
               </button>
@@ -245,11 +257,7 @@ const FormPreview: React.FC<FormPreviewProps> = ({
           <div className="form_preview_starter_state">
             <p> Add elements to see the preview...</p>
             <h3>Or</h3>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={loadForm}
-            />
+            <input type="file" ref={fileInputRef} onChange={loadForm} />
             <button onClick={() => fileInputRef.current?.click()}>
               Load Form
             </button>

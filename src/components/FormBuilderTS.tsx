@@ -37,6 +37,10 @@ const FormBuilderTS = () => {
         placeholder: "",
         input_type: "",
       };
+    } else if (selectedElement === "datetime-local") {
+      newProps = {
+        name: "",
+      };
     } else {
       newProps = {
         name: "",
