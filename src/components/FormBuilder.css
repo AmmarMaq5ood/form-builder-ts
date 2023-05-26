@@ -1,6 +1,7 @@
 .formbuilder__container {
   height: 100vh;
   width: 100vw;
+  overflow-x: hidden;
 }
 .formbuilder__header h1 {
   text-align: center;
@@ -20,6 +21,15 @@
 .formbuilder__body {
   display: flex;
   flex-direction: row;
+}
+
+@media (max-width: 850px) {
+  .formbuilder__body {
+    flex-direction: column;
+  }
+  .formbuilder__preview {
+    border-left: none;
+  }
 }
 
 .formbuilder__form-elements {
