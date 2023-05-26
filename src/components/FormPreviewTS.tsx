@@ -36,7 +36,7 @@ const FormPreview: React.FC<FormPreviewProps> = ({
     const blob = new Blob([JSON.stringify(dataToSave)], {
       type: "application/json;charset=utf-8",
     });
-    
+
     let saveFormName = "";
     if (inputValues && inputValues.formName) {
       saveFormName = inputValues.formName.toString() + ".json";
@@ -82,18 +82,8 @@ const FormPreview: React.FC<FormPreviewProps> = ({
   };
 
   return (
-    <div className="form-preview">
+    <div className="form_preview_container">
       <form onSubmit={handleSubmit}>
-        {elements.length ? (
-          <>
-            <label htmlFor="formName">Form Name:</label>{" "}
-            <Input
-              name="formName"
-              value={inputValues['formName'] as string || ""}
-              onChange={({ detail }) => handleInputChange("formName" ,detail.value)}
-            />
-          </>
-        ) : null}
         {elements.map((element, index) => (
           <div key={index}>
             {element.type === "input" && (
@@ -135,6 +125,7 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                   </label>
                 </div>
                 <select
+                  className="form_preview_select"
                   value={inputValues[element.props.name] || ""}
                   onChange={(event) =>
                     handleSelectChange(event, element.props.name)
@@ -151,7 +142,6 @@ const FormPreview: React.FC<FormPreviewProps> = ({
             {element.type === "radio" && (
               <>
                 <label
-                  style={{ fontWeight: "bolder" }}
                   htmlFor={element.props.name}
                 >
                   {element.props.name}:{" "}
@@ -160,7 +150,6 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                   <label key={index}>
                     <div>
                       <input
-                        style={{ fontWeight: 100 }}
                         type="radio"
                         name={element.props.name}
                         value={option.value}
@@ -180,7 +169,6 @@ const FormPreview: React.FC<FormPreviewProps> = ({
             {element.type === "checkbox" && (
               <>
                 <label
-                  style={{ fontWeight: "bolder" }}
                   htmlFor={element.props.name}
                 >
                   {element.props.name}:{" "}
@@ -190,7 +178,6 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                     <div key={index}>
                       <label>
                         <input
-                          style={{ marginRight: "5px" }}
                           type="checkbox"
                           name={element.props.name}
                           value={option.value}
@@ -234,25 +221,33 @@ const FormPreview: React.FC<FormPreviewProps> = ({
         ))}
         {elements.length ? (
           <>
-            <button onClick={saveForm}>Save to JSON</button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              onChange={loadForm}
+            <label htmlFor="formName">Form Name:</label>{" "}
+            <Input
+              name="formName"
+              value={(inputValues["formName"] as string) || ""}
+              onChange={({ detail }) =>
+                handleInputChange("formName", detail.value)
+              }
             />
-            <button onClick={() => fileInputRef.current?.click()}>
-              Load Form
-            </button>
+            <div className="form_preview_btn_container">
+              <button onClick={saveForm}>Save to JSON</button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={loadForm}
+              />
+              <button onClick={() => fileInputRef.current?.click()}>
+                Load Form
+              </button>
+            </div>
           </>
         ) : (
-          <div style={{ textAlign: "center" }}>
+          <div className="form_preview_starter_state">
             <p> Add elements to see the preview...</p>
             <h3>Or</h3>
             <input
               type="file"
               ref={fileInputRef}
-              style={{ display: "none" }}
               onChange={loadForm}
             />
             <button onClick={() => fileInputRef.current?.click()}>
