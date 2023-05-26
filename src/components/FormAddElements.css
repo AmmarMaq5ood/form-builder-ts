@@ -1,4 +1,4 @@
-select {
+.add_elements_select {
   padding: 5px;
   font-size: 14px;
   border: 2px solid #000;
@@ -6,17 +6,25 @@ select {
   background-color: #fff;
   color: #333;
   width: 200px;
-  margin: 5px;
+  margin-bottom: 5px;
 }
 
-/* Styling for select options */
-select option {
+.add_elements_select option {
   padding: 5px;
 }
 
-button {
+.add_elements_btn {
   padding: 5px;
-  margin: 5px;
+  margin-left: 5px;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 14px;
+  background-color: #4a4b4f;
+  border-color: #4a4b4f;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.add_elements_btn:hover {
+  background-color: #000;
 }
