@@ -85,11 +85,6 @@ const FormElements: React.FC<FormElementsProps> = ({
     <div
       ref={ref}
       key={index}
-      style={{
-        opacity: isDragging ? 0.1 : 1,
-        transform: `translate(0px, ${isDragging ? "-20px" : "0px"})`,
-        transition: "all 0.5s ease",
-      }}
     >
       <div ref={drop}>
         <div key={index}>
@@ -105,14 +100,14 @@ const FormElements: React.FC<FormElementsProps> = ({
             <h3>CheckBox</h3>
           ) : null}
           <div key={index} className="form_element_card">
-            <button
+            <img
               onClick={() => handleRemoveElement(index)}
               className="form_element_close"
-            >
-              ❌
-            </button>
-            <label style={{ fontWeight: "bolder" }}>
-              Name:{" "}
+              src={require("../assets/close_1.png")}
+              alt="close_icon"
+            />
+            <label className="form_element_label">
+              Name:
               <Input
                 type="text"
                 value={element.props.name}
@@ -125,7 +120,7 @@ const FormElements: React.FC<FormElementsProps> = ({
               />
             </label>
             {element.props.options ? null : (
-              <label style={{ fontWeight: "bolder" }}>
+              <label className="form_element_label">
                 Placeholder:
                 <Input
                   type="text"
@@ -141,9 +136,10 @@ const FormElements: React.FC<FormElementsProps> = ({
             )}
 
             {element.type === "input" && (
-              <label style={{ fontWeight: "bolder" }}>
+              <label className="form_element_label">
                 Input Type:
                 <select
+                  className="form_element_input_type"
                   value={element.props.input_type}
                   onChange={(e) =>
                     handlePropsChange(index, {
@@ -201,6 +197,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                         }}
                       />
                       <button
+                        className="form_element_remove_option"
                         onClick={() => handleRemoveOption(index, optionIndex)}
                       >
                         Remove
@@ -209,6 +206,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                   </div>
                 ))}
                 <button
+                  className="form_element_add_option"
                   onClick={() =>
                     handlePropsChange(index, {
                       ...element.props,
@@ -265,6 +263,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                         }}
                       />
                       <button
+                        className="form_element_remove_option"
                         onClick={() => handleRemoveOption(index, optionIndex)}
                       >
                         Remove
@@ -273,6 +272,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                   </div>
                 ))}
                 <button
+                  className="form_element_add_option"
                   onClick={() =>
                     handlePropsChange(index, {
                       ...element.props,

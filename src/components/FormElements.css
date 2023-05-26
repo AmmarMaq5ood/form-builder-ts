@@ -9,19 +9,68 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  margin: 5px 0 5px 0;
+}
+
+.form_element_label {
+  font-weight: bolder;
 }
 
 .form_element_close {
   position: absolute;
   top: 2px;
   right: 2px;
-  padding: 2px;
+  height: 30px;
+  width: 30px;
   cursor: pointer;
+}
+
+.form_element_input_type {
+  padding: 5px;
+  font-size: 14px;
+  border: 2px solid #000;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  width: 200px;
+  margin-left: 5px;
+}
+
+.form_element_input_type option {
+  padding: 5px;
 }
 
 .csd-input {
   display: flex;
   flex-direction: column;
+}
+
+.form_element_add_option,
+.form_element_remove_option {
+  padding: 5px;
+  margin-left: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  margin: 2px 0 2px 0;
+  transition: all 0.3s ease;
+}
+.form_element_add_option {
+  background-color: #4a4b4f;
+  border-color: #4a4b4f;
+  color: white;
+}
+
+.form_element_add_option:hover {
+  background-color: #000;
+}
+
+.form_element_remove_option {
+  background-color: #f0f0f0;
+}
+
+.form_element_remove_option:hover {
+  background-color: #fff;
 }
 
 label {
@@ -32,16 +81,16 @@ label {
 }
 
 input {
-  padding: 0.5rem;
-  border: 2px solid #d2d6dc;
-  border-radius: 5px;
+  padding: 0.2rem;
+  border: 2px solid #7d8998;
+  border-radius: 9px;
   font-size: 1rem;
   line-height: 1.5rem;
 }
 
 input:focus {
   outline: none;
-  border-color: #4a80cd;
+  border-color: #3f77c7;
 }
 
 input::placeholder {
