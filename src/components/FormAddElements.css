@@ -25,6 +25,16 @@
   transition: all 0.3s ease;
 }
 
-.add_elements_btn:hover {
+/* .add_elements_btn:hover {
   background-color: #000;
+} */
+
+.add_elements_btn:not(:disabled):hover {
+  background-color: #000;
+  /* Add any other styles for the hover effect when the button is not disabled */
+}
+
+.add_elements_btn:disabled {
+  /* Add any specific styles for the disabled state */
+  opacity: 0.5; /* Example: reduce opacity for disabled button */
 }
