@@ -19,7 +19,6 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
         className="add_elements_select"
         value={selectedElement}
         onChange={(e) => {
-          console.log(`Selected Element is: ${e.target.value}`);
           setSelectedElement(e.target.value);
         }}
       >
@@ -30,13 +29,20 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
         <option value="radio">Radio</option>
         <option value="checkbox">Checkbox</option>
         <option value="datetime-local">Datetime</option>
+        <option value="color">Color Picker</option>
       </select>
       {selectedElement === "" ? (
-        <button className="add_elements_btn" disabled onClick={handleAddElement}>
+        <button
+          className="add_elements_btn"
+          disabled
+          onClick={handleAddElement}
+        >
           Add
         </button>
       ) : (
-        <button className="add_elements_btn" onClick={handleAddElement}>Add</button>
+        <button className="add_elements_btn" onClick={handleAddElement}>
+          Add
+        </button>
       )}
     </div>
   );
