@@ -80,7 +80,6 @@ const FormPreview: React.FC<FormPreviewProps> = ({
     const value = event.target.value;
     handleInputChange(name, value);
   };
-
   return (
     <div className="form_preview_container">
       <form onSubmit={handleSubmit}>
@@ -222,6 +221,26 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                       type="datetime-local"
                       name={element.props.name}
                       value={(inputValues[element.props.name] as string) || ""}
+                      onChange={(event) =>
+                        handleInputChange(
+                          element.props.name,
+                          event.target.value
+                        )
+                      }
+                    />
+                  </div>
+                </label>
+              </div>
+            )}
+            {element.type === "color" && (
+              <div>
+                <label htmlFor={element.props.name}>
+                  {element.props?.name}:
+                  <div>
+                    <input
+                      type="color"
+                      name={element.props?.name}
+                      value={(inputValues[element.props?.name] as string) || ""}
                       onChange={(event) =>
                         handleInputChange(
                           element.props.name,
