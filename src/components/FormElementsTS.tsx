@@ -82,10 +82,7 @@ const FormElements: React.FC<FormElementsProps> = ({
   });
   drag(ref);
   return (
-    <div
-      ref={ref}
-      key={index}
-    >
+    <div ref={ref} key={index}>
       <div ref={drop}>
         <div key={index}>
           {element.type === "input" ? (
@@ -98,8 +95,10 @@ const FormElements: React.FC<FormElementsProps> = ({
             <h3>Radio</h3>
           ) : element.type === "checkbox" ? (
             <h3>CheckBox</h3>
-          ) :element.type === "datetime-local" ? (
+          ) : element.type === "datetime-local" ? (
             <h3>Datetime</h3>
+          ) : element.type === "color" ? (
+            <h3>Color Picker</h3>
           ) : null}
           <div key={index} className="form_element_card">
             <img
@@ -121,7 +120,9 @@ const FormElements: React.FC<FormElementsProps> = ({
                 }
               />
             </label>
-            {element.props.options || element.type === "datetime-local" ? null : (
+            {element.props.options ||
+            element.type === "datetime-local" ||
+            element.type === "color" ? null : (
               <label className="form_element_label">
                 Placeholder:
                 <Input
