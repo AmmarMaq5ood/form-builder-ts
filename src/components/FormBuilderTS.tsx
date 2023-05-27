@@ -37,7 +37,7 @@ const FormBuilderTS = () => {
         placeholder: "",
         input_type: "",
       };
-    } else if (selectedElement === "datetime-local") {
+    } else if (["color", "datetime-local"].includes(selectedElement)) {
       newProps = {
         name: "",
       };
@@ -65,15 +65,7 @@ const FormBuilderTS = () => {
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    const formData: { [key: string]: string } = {};
-    elements.forEach((element) => {
-      console.log(element);
-      formData[element.props.name] = "";
-    });
-    localStorage.setItem("formData", JSON.stringify(formData));
-    console.log(
-      `Form submitted, formData Submitted is: ${JSON.stringify(formData)}`
-    );
+    alert("Form Submitted Successfully!");
   };
 
   const handleRemoveOption = (elementIndex: number, optionIndex: number) => {
