@@ -1,7 +1,7 @@
 import { useState, FormEvent } from "react";
-import FormAddElements from "./FormAddElementsTS";
-import FormElements from "./FormElementsTS";
-import FormPreview from "./FormPreviewTS";
+import FormAddElements from "../FormAddElements/FormAddElements";
+import FormElements from "../FormElements/FormElements";
+import FormPreview from "../FormPreview/FormPreview";
 
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -65,7 +65,6 @@ const FormBuilderTS = () => {
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    alert("Form Submitted Successfully!");
   };
 
   const handleRemoveOption = (elementIndex: number, optionIndex: number) => {
@@ -97,9 +96,13 @@ const FormBuilderTS = () => {
       <div className="formbuilder__container">
         <div className="formbuilder__header">
           <h1>Form Builder</h1>
+          <p>Save and Load Your Forms Anytime!</p>
         </div>
         <div className="formbuilder__body">
           <div className="formbuilder__form-elements">
+            <h2 className="formbuilder_form-elements_heading">
+              Add Your Form Elements Here!
+            </h2>
             <FormAddElements
               selectedElement={selectedElement}
               setSelectedElement={setSelectedElement}
@@ -118,7 +121,7 @@ const FormBuilderTS = () => {
             ))}
           </div>
           <div className="formbuilder__preview">
-            <h2>Preview</h2>
+            <h2 className="formbuilder_preview_heading">Preview</h2>
             <FormPreview
               elements={elements}
               handleSubmit={handleSubmit}

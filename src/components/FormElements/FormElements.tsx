@@ -84,7 +84,7 @@ const FormElements: React.FC<FormElementsProps> = ({
   return (
     <div ref={ref} key={index}>
       <div ref={drop}>
-        <div key={index}>
+        <div key={index} className="form_element_field_heading">
           {element.type === "input" ? (
             <h3>Input</h3>
           ) : element.type === "textarea" ? (
@@ -101,12 +101,12 @@ const FormElements: React.FC<FormElementsProps> = ({
             <h3>Color Picker</h3>
           ) : null}
           <div key={index} className="form_element_card">
-            <img
+            <button
               onClick={() => handleRemoveElement(index)}
               className="form_element_close"
-              src={require("../assets/close_1.png")}
-              alt="close_icon"
-            />
+            >
+              x
+            </button>
             <label className="form_element_label">
               Name:
               <Input
@@ -162,7 +162,7 @@ const FormElements: React.FC<FormElementsProps> = ({
               <div>
                 {element.props.options?.map((option, optionIndex) => (
                   <div key={optionIndex}>
-                    <label>
+                    <label className="form_element_label">
                       Label:
                       <input
                         className="csd-input"
@@ -181,7 +181,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                         }}
                       />
                     </label>
-                    <label>
+                    <label className="form_element_label">
                       Value:
                       <input
                         className="csd-input"
@@ -220,7 +220,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                     })
                   }
                 >
-                  Add
+                  Add Option +1
                 </button>
               </div>
             ) : null}
@@ -228,7 +228,7 @@ const FormElements: React.FC<FormElementsProps> = ({
               <div>
                 {element.props.options?.map((option, optionIndex) => (
                   <div key={optionIndex}>
-                    <label>
+                    <label className="form_element_label">
                       Label:
                       <input
                         className="csd-input"
@@ -247,7 +247,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                         }}
                       />
                     </label>
-                    <label>
+                    <label className="form_element_label">
                       Value:
                       <input
                         className="csd-input"

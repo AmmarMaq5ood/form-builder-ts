@@ -1,8 +1,8 @@
 .form_element_card {
   flex: 1;
   width: 100%;
-  border: 1px solid whitesmoke;
-  background-color: whitesmoke;
+  border: 1px solid #516391;
+  background-color: #0e101c;
   border-radius: 5px;
   padding: 20px;
   margin-bottom: 20px;
@@ -14,15 +14,27 @@
 
 .form_element_label {
   font-weight: bolder;
+  color: white;
 }
 
 .form_element_close {
   position: absolute;
-  top: 2px;
-  right: 2px;
+  top: 5px;
+  right: 5px;
   height: 30px;
   width: 30px;
   cursor: pointer;
+  color: #fff;
+  background-color: #516391;
+  border: 1px solid #516391;
+  border-radius: 99px;
+  transition: 0.2s ease;
+}
+
+.form_element_close:hover {
+  background-color: #0e101c;
+  border-color: red;
+  color: #fff;
 }
 
 .form_element_input_type {
@@ -47,30 +59,24 @@
 
 .form_element_add_option,
 .form_element_remove_option {
-  padding: 5px;
-  margin-left: 5px;
-  border-radius: 5px;
+  padding: 6px 10px;
+  margin: 5px;
   cursor: pointer;
-  font-size: 13px;
-  margin: 2px 0 2px 0;
-  transition: all 0.3s ease;
-}
-.form_element_add_option {
-  background-color: #4a4b4f;
-  border-color: #4a4b4f;
+  font-size: 14px;
+  background-color: #516391;
+  border: 1px solid #516391;
   color: white;
+  transition: all 0.3s ease;
 }
 
 .form_element_add_option:hover {
-  background-color: #000;
-}
-
-.form_element_remove_option {
-  background-color: #f0f0f0;
+  background-color: #0e101c;
+  border: 1px solid red;
 }
 
 .form_element_remove_option:hover {
-  background-color: #fff;
+  background-color: #0e101c;
+  border: 1px solid red;
 }
 
 label {
@@ -100,4 +106,8 @@ input::placeholder {
 input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.form_element_field_heading h3 {
+  color: white;
 }

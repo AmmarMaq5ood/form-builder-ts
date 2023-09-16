@@ -1,5 +1,5 @@
 import "./App.css";
-import FormBuilderTS from "./components/FormBuilderTS";
+import FormBuilderTS from "./components/FormBuilder/FormBuilder";
 
 function App() {
   return (

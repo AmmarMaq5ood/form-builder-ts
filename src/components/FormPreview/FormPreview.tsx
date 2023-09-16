@@ -1,5 +1,13 @@
 import React, { useState, useRef } from "react";
-import { Input, InputProps, Textarea } from "@cloudscape-design/components";
+import {
+  Input,
+  InputProps,
+  Textarea,
+  Select,
+  SelectProps,
+  RadioGroup,
+  Checkbox,
+} from "@cloudscape-design/components";
 import FileSaver from "file-saver";
 
 import "./FormPreview.css";
@@ -47,39 +55,33 @@ const FormPreview: React.FC<FormPreviewProps> = ({
   };
 
   const loadForm = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const fileReader = new FileReader();
-    fileReader.onloadend = () => {
-      const content = fileReader.result;
-      if (content) {
-        const parsedContent = JSON.parse(content.toString());
-        updateElements(parsedContent.elements);
-        setInputValues(parsedContent.inputValues);
-      }
-    };
     if (event.target.files && event.target.files.length > 0) {
-      fileReader.readAsText(event.target.files[0]);
+      const file = event.target.files[0];
+      const ext = file.name.split(".").pop();
+
+      if (ext !== "json") {
+        alert("Please load a JSON file, no other file will be accepted!");
+        return;
+      }
+
+      const fileReader = new FileReader();
+      fileReader.onloadend = () => {
+        const content = fileReader.result;
+        if (content) {
+          const parsedContent = JSON.parse(content.toString());
+          updateElements(parsedContent.elements);
+          setInputValues(parsedContent.inputValues);
+        }
+      };
+      fileReader.readAsText(file);
     }
+    event.target.value = "";
   };
 
   const handleInputChange = (name: string, value: string | string[]) => {
     setInputValues((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-    name: string
-  ) => {
-    const value = event.target.value;
-    handleInputChange(name, value);
-  };
-
-  const handleRadioChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    name: string
-  ) => {
-    const value = event.target.value;
-    handleInputChange(name, value);
-  };
   return (
     <div className="form_preview_container">
       <form onSubmit={handleSubmit}>
@@ -118,24 +120,27 @@ const FormPreview: React.FC<FormPreviewProps> = ({
             )}
             {element.type === "select" && (
               <>
-                <div>
-                  <label htmlFor={element.props.name}>
-                    {element.props.name}:{" "}
-                  </label>
-                </div>
-                <select
-                  className="form_preview_select"
-                  value={inputValues[element.props.name] || ""}
-                  onChange={(event) =>
-                    handleSelectChange(event, element.props.name)
+                <label htmlFor={element.props.name}>
+                  {element.props.name}:{" "}
+                </label>
+                <Select
+                  selectedOption={
+                    element.props.options?.find(
+                      (option) =>
+                        option.value === inputValues[element.props.name]
+                    ) || { label: "Select an Option" }
                   }
-                >
-                  {element.props.options?.map((option, index) => (
-                    <option key={index} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={({ detail }) =>
+                    detail.selectedOption.value
+                      ? handleInputChange(
+                          element.props.name,
+                          detail.selectedOption.value
+                        )
+                      : undefined
+                  }
+                  options={element.props.options || []}
+                  selectedAriaLabel="Selected"
+                />
               </>
             )}
             {element.type === "radio" && (
@@ -143,24 +148,17 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                 <label htmlFor={element.props.name}>
                   {element.props.name}:{" "}
                 </label>
-                {element.props.options?.map((option, index) => (
-                  <label key={index}>
-                    <div>
-                      <input
-                        type="radio"
-                        name={element.props.name}
-                        value={option.value}
-                        checked={
-                          inputValues[element.props.name] === option.value
-                        }
-                        onChange={(event) =>
-                          handleRadioChange(event, element.props.name)
-                        }
-                      />
-                      {option.label}
-                    </div>
-                  </label>
-                ))}
+                <RadioGroup
+                  onChange={({ detail }) =>
+                    handleInputChange(element.props.name, detail.value)
+                  }
+                  value={
+                    Array.isArray(inputValues[element.props.name])
+                      ? ""
+                      : (inputValues[element.props.name] as string) || ""
+                  }
+                  items={element.props.options || []}
+                />
               </>
             )}
             {element.type === "checkbox" && (
@@ -172,31 +170,21 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                   {element.props.options?.map((option, index) => (
                     <div key={index}>
                       <label>
-                        <input
-                          type="checkbox"
-                          name={element.props.name}
-                          value={option.value}
-                          checked={
-                            Array.isArray(inputValues[element.props.name]) &&
-                            (
-                              inputValues[element.props.name] as string[]
-                            ).includes(option.value)
-                          }
+                        <Checkbox
                           onChange={(event) => {
                             const selectedValues =
                               inputValues[element.props.name] || [];
-                            const checkedValue = event.target.value;
                             let updatedValues: string[];
 
-                            if (event.target.checked) {
+                            if (event.detail.checked) {
                               updatedValues = [
                                 ...(selectedValues as string[]),
-                                checkedValue,
+                                option.value,
                               ];
                             } else {
                               updatedValues = (
                                 selectedValues as string[]
-                              ).filter((value) => value !== checkedValue);
+                              ).filter((value) => value !== option.value);
                             }
 
                             handleInputChange(
@@ -204,11 +192,18 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                               updatedValues
                             );
                           }}
-                        />
-                        {option.label}
+                          checked={
+                            Array.isArray(inputValues[element.props.name]) &&
+                            (
+                              inputValues[element.props.name] as string[]
+                            ).includes(option.value)
+                          }
+                        >
+                          {option.label}
+                        </Checkbox>
                       </label>
                     </div>
-                  ))}
+                  ))}{" "}
                 </div>
               </>
             )}
@@ -265,9 +260,14 @@ const FormPreview: React.FC<FormPreviewProps> = ({
               }
             />
             <div className="form_preview_btn_container">
-              <button onClick={saveForm}>Save to JSON</button>
+              <button className="form_preview_save_form_btn" onClick={saveForm}>
+                Save to JSON
+              </button>
               <input type="file" ref={fileInputRef} onChange={loadForm} />
-              <button onClick={() => fileInputRef.current?.click()}>
+              <button
+                className="form_preview_load_form_btn"
+                onClick={() => fileInputRef.current?.click()}
+              >
                 Load Form
               </button>
             </div>
@@ -277,7 +277,10 @@ const FormPreview: React.FC<FormPreviewProps> = ({
             <p> Add elements to see the preview...</p>
             <h3>Or</h3>
             <input type="file" ref={fileInputRef} onChange={loadForm} />
-            <button onClick={() => fileInputRef.current?.click()}>
+            <button
+              className="form_preview_load_form_btn"
+              onClick={() => fileInputRef.current?.click()}
+            >
               Load Form
             </button>
           </div>
