@@ -148,17 +148,26 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                 <label htmlFor={element.props.name}>
                   {element.props.name}:{" "}
                 </label>
-                <RadioGroup
-                  onChange={({ detail }) =>
-                    handleInputChange(element.props.name, detail.value)
-                  }
-                  value={
-                    Array.isArray(inputValues[element.props.name])
-                      ? ""
-                      : (inputValues[element.props.name] as string) || ""
-                  }
-                  items={element.props.options || []}
-                />
+                <div
+                  style={{
+                    backgroundColor: "white",
+                    padding: 2,
+                    borderRadius: 5,
+                    border: "2px solid gray",
+                  }}
+                >
+                  <RadioGroup
+                    onChange={({ detail }) =>
+                      handleInputChange(element.props.name, detail.value)
+                    }
+                    value={
+                      Array.isArray(inputValues[element.props.name])
+                        ? ""
+                        : (inputValues[element.props.name] as string) || ""
+                    }
+                    items={element.props.options || []}
+                  />
+                </div>
               </>
             )}
             {element.type === "checkbox" && (
@@ -169,39 +178,48 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                 <div>
                   {element.props.options?.map((option, index) => (
                     <div key={index}>
-                      <label>
-                        <Checkbox
-                          onChange={(event) => {
-                            const selectedValues =
-                              inputValues[element.props.name] || [];
-                            let updatedValues: string[];
+                      <div
+                        style={{
+                          backgroundColor: "white",
+                          padding: 2,
+                          borderRadius: 5,
+                          border: "2px solid gray",
+                        }}
+                      >
+                        <label>
+                          <Checkbox
+                            onChange={(event) => {
+                              const selectedValues =
+                                inputValues[element.props.name] || [];
+                              let updatedValues: string[];
 
-                            if (event.detail.checked) {
-                              updatedValues = [
-                                ...(selectedValues as string[]),
-                                option.value,
-                              ];
-                            } else {
-                              updatedValues = (
-                                selectedValues as string[]
-                              ).filter((value) => value !== option.value);
+                              if (event.detail.checked) {
+                                updatedValues = [
+                                  ...(selectedValues as string[]),
+                                  option.value,
+                                ];
+                              } else {
+                                updatedValues = (
+                                  selectedValues as string[]
+                                ).filter((value) => value !== option.value);
+                              }
+
+                              handleInputChange(
+                                element.props.name,
+                                updatedValues
+                              );
+                            }}
+                            checked={
+                              Array.isArray(inputValues[element.props.name]) &&
+                              (
+                                inputValues[element.props.name] as string[]
+                              ).includes(option.value)
                             }
-
-                            handleInputChange(
-                              element.props.name,
-                              updatedValues
-                            );
-                          }}
-                          checked={
-                            Array.isArray(inputValues[element.props.name]) &&
-                            (
-                              inputValues[element.props.name] as string[]
-                            ).includes(option.value)
-                          }
-                        >
-                          {option.label}
-                        </Checkbox>
-                      </label>
+                          >
+                            {option.label}
+                          </Checkbox>
+                        </label>
+                      </div>
                     </div>
                   ))}{" "}
                 </div>

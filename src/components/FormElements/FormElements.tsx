@@ -187,6 +187,7 @@ const FormElements: React.FC<FormElementsProps> = ({
                         className="csd-input"
                         type="text"
                         value={option.value}
+                        placeholder="Required & Unique"
                         onChange={(e) => {
                           const newOptions = [...element.props.options!];
                           newOptions[optionIndex] = {
