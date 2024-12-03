@@ -1,10 +1,9 @@
 import { useState, FormEvent } from "react";
 import FormAddElements from "../FormAddElements/FormAddElements";
-import FormElements from "../FormElements/FormElements";
+import DraggableFormElements from "../FormElements/FormElements";
 import FormPreview from "../FormPreview/FormPreview";
 
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { DndContext } from "@dnd-kit/core";
 
 import "./FormBuilder.css";
 
@@ -92,7 +91,7 @@ const FormBuilderTS = () => {
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndContext> {/* Replaced DndProvider */}
       <div className="formbuilder__container">
         <div className="formbuilder__header">
           <h1>Form Builder</h1>
@@ -108,17 +107,13 @@ const FormBuilderTS = () => {
               setSelectedElement={setSelectedElement}
               handleAddElement={handleAddElement}
             />
-            {elements?.map((element, index) => (
-              <FormElements
-                key={index}
-                element={element}
-                index={index}
-                handlePropsChange={handlePropsChange}
-                handleRemoveElement={handleRemoveElement}
-                handleRemoveOption={handleRemoveOption}
-                handleMoveElement={handleMoveElement}
-              />
-            ))}
+            <DraggableFormElements
+              elements={elements}
+              handlePropsChange={handlePropsChange}
+              handleRemoveElement={handleRemoveElement}
+              handleRemoveOption={handleRemoveOption}
+              handleMoveElement={handleMoveElement}
+            />
           </div>
           <div className="formbuilder__preview">
             <h2 className="formbuilder_preview_heading">Preview</h2>
@@ -130,7 +125,7 @@ const FormBuilderTS = () => {
           </div>
         </div>
       </div>
-    </DndProvider>
+    </DndContext>
   );
 };
 
