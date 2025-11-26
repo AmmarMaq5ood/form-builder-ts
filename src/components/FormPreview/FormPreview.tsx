@@ -1,10 +1,9 @@
 import React, { useState, useRef } from "react";
 import {
   Input,
-  InputProps,
+  type InputProps,
   Textarea,
   Select,
-  SelectProps,
   RadioGroup,
   Checkbox,
 } from "@cloudscape-design/components";
@@ -133,9 +132,9 @@ const FormPreview: React.FC<FormPreviewProps> = ({
                   onChange={({ detail }) =>
                     detail.selectedOption.value
                       ? handleInputChange(
-                          element.props.name,
-                          detail.selectedOption.value
-                        )
+                        element.props.name,
+                        detail.selectedOption.value
+                      )
                       : undefined
                   }
                   options={element.props.options || []}

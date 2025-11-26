@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
 import "./FormElements.css";
-import { XYCoord } from "dnd-core";
+import type { XYCoord } from "dnd-core";
 import { Input } from "@cloudscape-design/components";
 
-import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
+import { useDrag, useDrop, type DropTargetMonitor } from "react-dnd";
 
 interface Item {
   type: string;
@@ -37,12 +37,9 @@ const FormElements: React.FC<FormElementsProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const [{ isDragging }, drag] = useDrag({
+  const [, drag] = useDrag({
     type: "formElement",
     item: { index },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
   });
 
   const [, drop] = useDrop<Item, any, any>({
@@ -80,10 +77,10 @@ const FormElements: React.FC<FormElementsProps> = ({
       item.index = hoverIndex;
     },
   });
-  drag(ref);
+  drag(drop(ref));
   return (
     <div ref={ref} key={index}>
-      <div ref={drop}>
+      <div>
         <div key={index} className="form_element_field_heading">
           {element.type === "input" ? (
             <h3>Input</h3>
@@ -121,8 +118,8 @@ const FormElements: React.FC<FormElementsProps> = ({
               />
             </label>
             {element.props.options ||
-            element.type === "datetime-local" ||
-            element.type === "color" ? null : (
+              element.type === "datetime-local" ||
+              element.type === "color" ? null : (
               <label className="form_element_label">
                 Placeholder:
                 <Input
