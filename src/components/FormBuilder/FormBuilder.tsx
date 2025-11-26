@@ -1,28 +1,46 @@
-import { useState, FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+
 import FormAddElements from "../FormAddElements/FormAddElements";
 import FormElements from "../FormElements/FormElements";
 import FormPreview from "../FormPreview/FormPreview";
 
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-
-import "./FormBuilder.css";
-
-type FormElementProps = {
+export type FormElementProps = {
   name: string;
   placeholder?: string;
   input_type?: string;
   options?: { label: string; value: string }[];
 };
 
-type FormElement = {
+export type FormElement = {
+  id: string;
   type: string;
   props: FormElementProps;
 };
 
-const FormBuilderTS = () => {
+const FormBuilder = () => {
   const [elements, setElements] = useState<FormElement[]>([]);
   const [selectedElement, setSelectedElement] = useState<string>("");
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const handleAddElement = () => {
     let newProps: FormElementProps;
@@ -35,7 +53,7 @@ const FormBuilderTS = () => {
       newProps = {
         name: "",
         placeholder: "",
-        input_type: "",
+        input_type: "text",
       };
     } else if (["color", "datetime-local"].includes(selectedElement)) {
       newProps = {
@@ -47,44 +65,54 @@ const FormBuilderTS = () => {
         placeholder: "",
       };
     }
-    const newElement: FormElement = { type: selectedElement, props: newProps };
+
+    const newElement: FormElement = {
+      id: `element-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      type: selectedElement,
+      props: newProps,
+    };
     setElements([...elements, newElement]);
   };
 
-  const handlePropsChange = (index: number, newProps: FormElementProps) => {
-    const newElements = [...elements];
-    newElements[index].props = newProps;
-    setElements(newElements);
+  const handlePropsChange = (id: string, newProps: FormElementProps) => {
+    setElements((prev) =>
+      prev.map((el) => (el.id === id ? { ...el, props: newProps } : el))
+    );
   };
 
-  const handleRemoveElement = (index: number) => {
-    const newElements = [...elements];
-    newElements.splice(index, 1);
-    setElements(newElements);
+  const handleRemoveElement = (id: string) => {
+    setElements((prev) => prev.filter((el) => el.id !== id));
   };
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
+    console.log("Form Submitted", elements);
+    alert("Form Submitted! Check console for data.");
   };
 
-  const handleRemoveOption = (elementIndex: number, optionIndex: number) => {
-    const newElements = [...elements];
-    const options = newElements[elementIndex].props.options;
-    if (options) {
-      options.splice(optionIndex, 1);
-      handlePropsChange(elementIndex, {
-        ...newElements[elementIndex].props,
-        options: options,
+  const handleRemoveOption = (elementId: string, optionIndex: number) => {
+    setElements((prev) =>
+      prev.map((el) => {
+        if (el.id === elementId && el.props.options) {
+          const newOptions = [...el.props.options];
+          newOptions.splice(optionIndex, 1);
+          return { ...el, props: { ...el.props, options: newOptions } };
+        }
+        return el;
+      })
+    );
+  };
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setElements((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
       });
     }
-  };
-
-  const handleMoveElement = (dragIndex: number, hoverIndex: number) => {
-    const dragElement = elements[dragIndex];
-    const newElements = [...elements];
-    newElements.splice(dragIndex, 1);
-    newElements.splice(hoverIndex, 0, dragElement);
-    setElements(newElements);
   };
 
   const updateElements = (newElements: FormElement[]) => {
@@ -92,46 +120,66 @@ const FormBuilderTS = () => {
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="formbuilder__container">
-        <div className="formbuilder__header">
-          <h1>Form Builder</h1>
-          <p>Save and Load Your Forms Anytime!</p>
+    <div className="flex flex-col lg:flex-row gap-8">
+      {/* Builder Section */}
+      <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+        <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Builder</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Configure your form elements</p>
         </div>
-        <div className="formbuilder__body">
-          <div className="formbuilder__form-elements">
-            <h2 className="formbuilder_form-elements_heading">
-              Add Your Form Elements Here!
-            </h2>
-            <FormAddElements
-              selectedElement={selectedElement}
-              setSelectedElement={setSelectedElement}
-              handleAddElement={handleAddElement}
-            />
-            {elements?.map((element, index) => (
-              <FormElements
-                key={index}
-                element={element}
-                index={index}
-                handlePropsChange={handlePropsChange}
-                handleRemoveElement={handleRemoveElement}
-                handleRemoveOption={handleRemoveOption}
-                handleMoveElement={handleMoveElement}
-              />
-            ))}
-          </div>
-          <div className="formbuilder__preview">
-            <h2 className="formbuilder_preview_heading">Preview</h2>
-            <FormPreview
-              elements={elements}
-              handleSubmit={handleSubmit}
-              updateElements={updateElements}
-            />
-          </div>
+
+        <div className="mb-8">
+          <FormAddElements
+            selectedElement={selectedElement}
+            setSelectedElement={setSelectedElement}
+            handleAddElement={handleAddElement}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={elements.map((el) => el.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {elements.length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-400">
+                  No elements added yet. Start by adding one above!
+                </div>
+              ) : (
+                elements.map((element) => (
+                  <FormElements
+                    key={element.id}
+                    element={element}
+                    handlePropsChange={handlePropsChange}
+                    handleRemoveElement={handleRemoveElement}
+                    handleRemoveOption={handleRemoveOption}
+                  />
+                ))
+              )}
+            </SortableContext>
+          </DndContext>
         </div>
       </div>
-    </DndProvider>
+
+      {/* Preview Section */}
+      <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 sticky top-8 h-fit">
+        <div className="mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Preview</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">See how your form looks</p>
+        </div>
+        <FormPreview
+          elements={elements}
+          handleSubmit={handleSubmit}
+          updateElements={updateElements}
+        />
+      </div>
+    </div>
   );
 };
 
-export default FormBuilderTS;
+export default FormBuilder;

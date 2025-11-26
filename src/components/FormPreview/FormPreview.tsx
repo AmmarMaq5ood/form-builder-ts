@@ -1,28 +1,12 @@
 import React, { useState, useRef } from "react";
-import {
-  Input,
-  type InputProps,
-  Textarea,
-  Select,
-  RadioGroup,
-  Checkbox,
-} from "@cloudscape-design/components";
 import FileSaver from "file-saver";
-
-import "./FormPreview.css";
+import { Upload, Save } from "lucide-react";
+import type { FormElement } from "../FormBuilder/FormBuilder";
 
 type FormPreviewProps = {
-  elements: {
-    type: string;
-    props: {
-      name: string;
-      placeholder?: string;
-      input_type?: string;
-      options?: { label: string; value: string }[];
-    };
-  }[];
+  elements: FormElement[];
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  updateElements: (newElements: any) => void;
+  updateElements: (newElements: FormElement[]) => void;
 };
 
 const FormPreview: React.FC<FormPreviewProps> = ({
@@ -35,20 +19,19 @@ const FormPreview: React.FC<FormPreviewProps> = ({
   >({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const saveForm = () => {
+  const saveForm = (e: React.MouseEvent) => {
+    e.preventDefault();
     const dataToSave = {
       elements: elements,
       inputValues: inputValues,
     };
-    const blob = new Blob([JSON.stringify(dataToSave)], {
+    const blob = new Blob([JSON.stringify(dataToSave, null, 2)], {
       type: "application/json;charset=utf-8",
     });
 
-    let saveFormName = "";
+    let saveFormName = "form.json";
     if (inputValues && inputValues.formName) {
       saveFormName = inputValues.formName.toString() + ".json";
-    } else {
-      saveFormName = "form.json";
     }
     FileSaver.saveAs(blob, saveFormName);
   };
@@ -67,9 +50,18 @@ const FormPreview: React.FC<FormPreviewProps> = ({
       fileReader.onloadend = () => {
         const content = fileReader.result;
         if (content) {
-          const parsedContent = JSON.parse(content.toString());
-          updateElements(parsedContent.elements);
-          setInputValues(parsedContent.inputValues);
+          try {
+            const parsedContent = JSON.parse(content.toString());
+            if (parsedContent.elements) {
+              updateElements(parsedContent.elements);
+              setInputValues(parsedContent.inputValues || {});
+            } else {
+              alert("Invalid form file format");
+            }
+          } catch (error) {
+            console.error("Error parsing JSON", error);
+            alert("Error parsing JSON file");
+          }
         }
       };
       fileReader.readAsText(file);
@@ -82,225 +74,280 @@ const FormPreview: React.FC<FormPreviewProps> = ({
   };
 
   return (
-    <div className="form_preview_container">
-      <form onSubmit={handleSubmit}>
-        {elements.map((element, index) => (
-          <div key={index}>
-            {element.type === "input" && (
-              <>
-                <label htmlFor={element.props.name}>
-                  {element.props.name}:{" "}
-                </label>
-                <Input
-                  name={element.props.name}
-                  placeholder={element.props.placeholder}
-                  type={(element.props.input_type as InputProps.Type) || "text"}
-                  value={(inputValues[element.props.name] as string) || ""}
-                  onChange={({ detail }) =>
-                    handleInputChange(element.props.name, detail.value)
-                  }
-                />
-              </>
-            )}
-            {element.type === "textarea" && (
-              <>
-                <label htmlFor={element.props.name}>
-                  {element.props.name}:{" "}
-                </label>
-                <Textarea
-                  name={element.props.name}
-                  placeholder={element.props.placeholder}
-                  value={(inputValues[element.props.name] as string) || ""}
-                  onChange={({ detail }) =>
-                    handleInputChange(element.props.name, detail.value)
-                  }
-                />
-              </>
-            )}
-            {element.type === "select" && (
-              <>
-                <label htmlFor={element.props.name}>
-                  {element.props.name}:{" "}
-                </label>
-                <Select
-                  selectedOption={
-                    element.props.options?.find(
-                      (option) =>
-                        option.value === inputValues[element.props.name]
-                    ) || { label: "Select an Option" }
-                  }
-                  onChange={({ detail }) =>
-                    detail.selectedOption.value
-                      ? handleInputChange(
-                        element.props.name,
-                        detail.selectedOption.value
-                      )
-                      : undefined
-                  }
-                  options={element.props.options || []}
-                  selectedAriaLabel="Selected"
-                />
-              </>
-            )}
-            {element.type === "radio" && (
-              <>
-                <label htmlFor={element.props.name}>
-                  {element.props.name}:{" "}
-                </label>
-                <div
-                  style={{
-                    backgroundColor: "white",
-                    padding: 2,
-                    borderRadius: 5,
-                    border: "2px solid gray",
-                  }}
-                >
-                  <RadioGroup
-                    onChange={({ detail }) =>
-                      handleInputChange(element.props.name, detail.value)
-                    }
-                    value={
-                      Array.isArray(inputValues[element.props.name])
-                        ? ""
-                        : (inputValues[element.props.name] as string) || ""
-                    }
-                    items={element.props.options || []}
-                  />
-                </div>
-              </>
-            )}
-            {element.type === "checkbox" && (
-              <>
-                <label htmlFor={element.props.name}>
-                  {element.props.name}:{" "}
-                </label>
-                <div>
-                  {element.props.options?.map((option, index) => (
-                    <div key={index}>
-                      <div
-                        style={{
-                          backgroundColor: "white",
-                          padding: 2,
-                          borderRadius: 5,
-                          border: "2px solid gray",
-                        }}
-                      >
-                        <label>
-                          <Checkbox
-                            onChange={(event) => {
-                              const selectedValues =
-                                inputValues[element.props.name] || [];
-                              let updatedValues: string[];
-
-                              if (event.detail.checked) {
-                                updatedValues = [
-                                  ...(selectedValues as string[]),
-                                  option.value,
-                                ];
-                              } else {
-                                updatedValues = (
-                                  selectedValues as string[]
-                                ).filter((value) => value !== option.value);
-                              }
-
+    <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {elements.length === 0 ? (
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            <p className="mb-4">Add elements to see the preview...</p>
+            <div className="flex justify-center gap-4">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={loadForm}
+                className="hidden"
+                accept=".json"
+              />
+              <button
+                type="button"
+                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-200"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload size={16} />
+                Load Form
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {elements.map((element) => (
+              <div key={element.id} className="space-y-2">
+                {element.type === "input" && (
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor={element.props.name}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      {element.props.name}
+                    </label>
+                    <input
+                      id={element.props.name}
+                      name={element.props.name}
+                      placeholder={element.props.placeholder}
+                      type={element.props.input_type || "text"}
+                      value={(inputValues[element.props.name] as string) || ""}
+                      onChange={(e) =>
+                        handleInputChange(element.props.name, e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    />
+                  </div>
+                )}
+                {element.type === "textarea" && (
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor={element.props.name}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      {element.props.name}
+                    </label>
+                    <textarea
+                      id={element.props.name}
+                      name={element.props.name}
+                      placeholder={element.props.placeholder}
+                      value={(inputValues[element.props.name] as string) || ""}
+                      onChange={(e) =>
+                        handleInputChange(element.props.name, e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white min-h-[100px]"
+                    />
+                  </div>
+                )}
+                {element.type === "select" && (
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor={element.props.name}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      {element.props.name}
+                    </label>
+                    <select
+                      id={element.props.name}
+                      value={(inputValues[element.props.name] as string) || ""}
+                      onChange={(e) =>
+                        handleInputChange(element.props.name, e.target.value)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    >
+                      <option value="">Select an Option</option>
+                      {element.props.options?.map((option, idx) => (
+                        <option key={idx} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {element.type === "radio" && (
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {element.props.name}
+                    </label>
+                    <div className="space-y-2">
+                      {element.props.options?.map((option, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            id={`${element.props.name}-${idx}`}
+                            name={element.props.name}
+                            value={option.value}
+                            checked={
+                              (inputValues[element.props.name] as string) ===
+                              option.value
+                            }
+                            onChange={(e) =>
                               handleInputChange(
                                 element.props.name,
-                                updatedValues
-                              );
-                            }}
+                                e.target.value
+                              )
+                            }
+                            className="text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600"
+                          />
+                          <label
+                            htmlFor={`${element.props.name}-${idx}`}
+                            className="text-sm text-gray-700 dark:text-gray-300"
+                          >
+                            {option.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {element.type === "checkbox" && (
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {element.props.name}
+                    </label>
+                    <div className="space-y-2">
+                      {element.props.options?.map((option, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id={`${element.props.name}-${idx}`}
+                            value={option.value}
                             checked={
                               Array.isArray(inputValues[element.props.name]) &&
                               (
                                 inputValues[element.props.name] as string[]
                               ).includes(option.value)
                             }
+                            onChange={(e) => {
+                              const selectedValues =
+                                (inputValues[element.props.name] as string[]) ||
+                                [];
+                              let updatedValues: string[];
+                              if (e.target.checked) {
+                                updatedValues = [...selectedValues, option.value];
+                              } else {
+                                updatedValues = selectedValues.filter(
+                                  (val) => val !== option.value
+                                );
+                              }
+                              handleInputChange(
+                                element.props.name,
+                                updatedValues
+                              );
+                            }}
+                            className="text-blue-600 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 rounded"
+                          />
+                          <label
+                            htmlFor={`${element.props.name}-${idx}`}
+                            className="text-sm text-gray-700 dark:text-gray-300"
                           >
                             {option.label}
-                          </Checkbox>
-                        </label>
-                      </div>
+                          </label>
+                        </div>
+                      ))}
                     </div>
-                  ))}{" "}
-                </div>
-              </>
-            )}
-            {element.type === "datetime-local" && (
-              <div>
-                <label htmlFor={element.props.name}>
-                  {element.props.name}:
-                  <div>
+                  </div>
+                )}
+                {element.type === "datetime-local" && (
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor={element.props.name}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      {element.props.name}
+                    </label>
                     <input
                       type="datetime-local"
+                      id={element.props.name}
                       name={element.props.name}
                       value={(inputValues[element.props.name] as string) || ""}
-                      onChange={(event) =>
-                        handleInputChange(
-                          element.props.name,
-                          event.target.value
-                        )
+                      onChange={(e) =>
+                        handleInputChange(element.props.name, e.target.value)
                       }
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                     />
                   </div>
-                </label>
-              </div>
-            )}
-            {element.type === "color" && (
-              <div>
-                <label htmlFor={element.props.name}>
-                  {element.props?.name}:
-                  <div>
-                    <input
-                      type="color"
-                      name={element.props?.name}
-                      value={(inputValues[element.props?.name] as string) || ""}
-                      onChange={(event) =>
-                        handleInputChange(
-                          element.props.name,
-                          event.target.value
-                        )
-                      }
-                    />
+                )}
+                {element.type === "color" && (
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor={element.props.name}
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
+                      {element.props.name}
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="color"
+                        id={element.props.name}
+                        name={element.props.name}
+                        value={
+                          (inputValues[element.props.name] as string) ||
+                          "#000000"
+                        }
+                        onChange={(e) =>
+                          handleInputChange(element.props.name, e.target.value)
+                        }
+                        className="h-10 w-20 p-1 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer"
+                      />
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {inputValues[element.props.name] || "#000000"}
+                      </span>
+                    </div>
                   </div>
-                </label>
+                )}
               </div>
-            )}
-          </div>
-        ))}
-        {elements.length ? (
-          <>
-            <label htmlFor="formName">Form Name:</label>{" "}
-            <Input
-              name="formName"
-              value={(inputValues["formName"] as string) || ""}
-              onChange={({ detail }) =>
-                handleInputChange("formName", detail.value)
-              }
-            />
-            <div className="form_preview_btn_container">
-              <button className="form_preview_save_form_btn" onClick={saveForm}>
-                Save to JSON
-              </button>
-              <input type="file" ref={fileInputRef} onChange={loadForm} />
-              <button
-                className="form_preview_load_form_btn"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Load Form
-              </button>
+            ))}
+
+            <div className="pt-6 border-t border-gray-200 dark:border-gray-700 space-y-4">
+              <div className="flex flex-col gap-1">
+                <label
+                  htmlFor="formName"
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Form Name
+                </label>
+                <input
+                  id="formName"
+                  type="text"
+                  placeholder="Enter form name to save"
+                  value={(inputValues["formName"] as string) || ""}
+                  onChange={(e) => handleInputChange("formName", e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={saveForm}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-sm"
+                >
+                  <Save size={18} />
+                  Save JSON
+                </button>
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={loadForm}
+                  className="hidden"
+                  accept=".json"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
+                >
+                  <Upload size={18} />
+                  Load JSON
+                </button>
+              </div>
             </div>
           </>
-        ) : (
-          <div className="form_preview_starter_state">
-            <p> Add elements to see the preview...</p>
-            <h3>Or</h3>
-            <input type="file" ref={fileInputRef} onChange={loadForm} />
-            <button
-              className="form_preview_load_form_btn"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              Load Form
-            </button>
-          </div>
         )}
       </form>
     </div>
