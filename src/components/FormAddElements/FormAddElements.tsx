@@ -1,141 +1,239 @@
-import clsx from "clsx";
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Type,
-  AlignLeft,
-  ListChecks,
-  RadioTower,
   CheckSquare,
-  CalendarClock,
-  Droplets,
-  SlidersHorizontal,
-  UploadCloud,
-  Heading as HeadingIcon,
-  TextQuote,
+  Circle,
+  AlignLeft,
+  Image as ImageIcon,
+  Calendar,
+  Hash,
+  Mail,
+  Phone,
+  Layout,
+  Minus,
   Search,
   X,
   GripVertical,
   Layers,
   ChevronLeft,
   ChevronRight,
+  List,
+  CheckCircle2,
+  FileText,
+  Clock,
+  Upload,
+  Video,
+  Music,
+  Link,
+  Box,
+  SeparatorHorizontal,
 } from "lucide-react";
+import { clsx } from "clsx";
+import { motion } from "framer-motion";
 
-export const ELEMENT_DRAG_TYPE = "application/x-form-element";
+interface FormAddElementsProps {
+  handleAddElement: (type: string) => void;
+  onDragStateChange?: (isDragging: boolean) => void;
+}
 
-type PaletteItem = {
+interface PaletteItem {
   type: string;
   label: string;
   description: string;
-  icon: React.ComponentType<{ size?: number }>;
+  icon: React.ElementType;
   category: "inputs" | "choices" | "media" | "layout";
-};
+}
+
+export const ELEMENT_DRAG_TYPE = "application/react-dnd";
 
 const ELEMENT_LIBRARY: PaletteItem[] = [
+  // Inputs
   {
     type: "input",
     label: "Text Input",
-    description: "Single-line text",
+    description: "Single-line text field",
     icon: Type,
     category: "inputs",
   },
   {
     type: "textarea",
-    label: "Paragraph",
-    description: "Multi-line text",
+    label: "Text Area",
+    description: "Multi-line text field",
     icon: AlignLeft,
     category: "inputs",
   },
   {
-    type: "datetime-local",
-    label: "Date & Time",
-    description: "Schedule input",
-    icon: CalendarClock,
+    type: "number",
+    label: "Number",
+    description: "Numeric input",
+    icon: Hash,
     category: "inputs",
   },
   {
-    type: "select",
-    label: "Dropdown",
-    description: "Pick one option",
-    icon: ListChecks,
+    type: "email",
+    label: "Email",
+    description: "Email address validation",
+    icon: Mail,
+    category: "inputs",
+  },
+  {
+    type: "phone",
+    label: "Phone",
+    description: "Phone number input",
+    icon: Phone,
+    category: "inputs",
+  },
+  {
+    type: "date",
+    label: "Date Picker",
+    description: "Select a date",
+    icon: Calendar,
+    category: "inputs",
+  },
+  {
+    type: "time",
+    label: "Time Picker",
+    description: "Select a time",
+    icon: Clock,
+    category: "inputs",
+  },
+  {
+    type: "url",
+    label: "Website",
+    description: "URL input field",
+    icon: Link,
+    category: "inputs",
+  },
+
+  // Choices
+  {
+    type: "checkbox",
+    label: "Checkbox",
+    description: "Multiple selection",
+    icon: CheckSquare,
     category: "choices",
   },
   {
     type: "radio",
     label: "Radio Group",
-    description: "Single choice",
-    icon: RadioTower,
+    description: "Single selection",
+    icon: Circle,
     category: "choices",
   },
   {
-    type: "checkbox",
-    label: "Checkboxes",
-    description: "Multiple choices",
-    icon: CheckSquare,
+    type: "select",
+    label: "Dropdown",
+    description: "Select from a list",
+    icon: List,
     category: "choices",
   },
   {
-    type: "color",
-    label: "Color Picker",
-    description: "Color selection",
-    icon: Droplets,
-    category: "media",
+    type: "switch",
+    label: "Switch",
+    description: "Toggle on/off",
+    icon: CheckCircle2,
+    category: "choices",
   },
+
+  // Media & Files
   {
-    type: "range",
-    label: "Slider",
-    description: "Value range",
-    icon: SlidersHorizontal,
+    type: "image",
+    label: "Image",
+    description: "Upload or display image",
+    icon: ImageIcon,
     category: "media",
   },
   {
     type: "file",
     label: "File Upload",
-    description: "Attach files",
-    icon: UploadCloud,
+    description: "Upload any file type",
+    icon: Upload,
     category: "media",
   },
   {
-    type: "heading",
-    label: "Section Heading",
-    description: "Organize sections",
-    icon: HeadingIcon,
+    type: "video",
+    label: "Video",
+    description: "Embed or upload video",
+    icon: Video,
+    category: "media",
+  },
+  {
+    type: "audio",
+    label: "Audio",
+    description: "Audio player",
+    icon: Music,
+    category: "media",
+  },
+
+  // Layout
+  {
+    type: "header",
+    label: "Header",
+    description: "Section title",
+    icon: FileText,
     category: "layout",
   },
   {
     type: "paragraph",
-    label: "Paragraph Info",
-    description: "Helper text",
-    icon: TextQuote,
+    label: "Paragraph",
+    description: "Static text content",
+    icon: AlignLeft,
+    category: "layout",
+  },
+  {
+    type: "divider",
+    label: "Divider",
+    description: "Horizontal line",
+    icon: Minus,
+    category: "layout",
+  },
+  {
+    type: "spacer",
+    label: "Spacer",
+    description: "Vertical spacing",
+    icon: SeparatorHorizontal,
+    category: "layout",
+  },
+  {
+    type: "container",
+    label: "Container",
+    description: "Group elements",
+    icon: Box,
     category: "layout",
   },
 ];
 
 const CATEGORIES = [
-  { id: "all", label: "All Elements", icon: Layers },
-  { id: "inputs", label: "Form Inputs", icon: Type },
+  { id: "all", label: "All", icon: Layers },
+  { id: "inputs", label: "Inputs", icon: Type },
   { id: "choices", label: "Choices", icon: CheckSquare },
-  { id: "media", label: "Media & Files", icon: UploadCloud },
-  { id: "layout", label: "Layout", icon: HeadingIcon },
-] as const;
-
-type FormAddElementsProps = {
-  handleAddElement: (type: string) => void;
-  onDragStateChange?: (active: boolean) => void;
-};
+  { id: "media", label: "Media", icon: ImageIcon },
+  { id: "layout", label: "Layout", icon: Layout },
+];
 
 const FormAddElements: React.FC<FormAddElementsProps> = ({
   handleAddElement,
   onDragStateChange,
 }) => {
-  const [userWantsOpen, setUserWantsOpen] = useState(true); // User's preference
+  const [userWantsOpen, setUserWantsOpen] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // Actual visibility: hide during drag, otherwise follow user preference
+  // Calculate actual visibility based on drag state and user preference
   const isVisible = !isDragging && userWantsOpen;
 
-  // Keyboard shortcut to toggle panel
+  const filteredElements = useMemo(() => {
+    return ELEMENT_LIBRARY.filter((item) => {
+      const matchesSearch =
+        item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory =
+        selectedCategory === "all" || item.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -147,33 +245,11 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const filteredElements = useMemo(() => {
-    let filtered = ELEMENT_LIBRARY;
-
-    // Filter by category
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter((item) => item.category === selectedCategory);
-    }
-
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (item) =>
-          item.label.toLowerCase().includes(query) ||
-          item.description.toLowerCase().includes(query) ||
-          item.type.toLowerCase().includes(query)
-      );
-    }
-
-    return filtered;
-  }, [searchQuery, selectedCategory]);
-
   const handleDragStart = (
     event: React.DragEvent<HTMLButtonElement>,
     type: string
   ) => {
-    event.dataTransfer.setData(ELEMENT_DRAG_TYPE, type);
+    event.dataTransfer.setData("application/react-dnd", type);
     event.dataTransfer.effectAllowed = "copy";
     setIsDragging(true);
     onDragStateChange?.(true);
@@ -186,16 +262,49 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
 
   const PANEL_WIDTH = "min(480px, 85vw)";
 
+  // Animation variants
+  const containerVariants = {
+    open: {
+      x: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      },
+    },
+    closed: {
+      x: `calc(-1 * ${PANEL_WIDTH})`,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      },
+    },
+  };
+
+  const listVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    show: { opacity: 1, x: 0 },
+  };
+
   return (
     <div className="relative">
       {/* Sidebar Container - moves as one unit */}
-      <div
-        className="fixed top-44 left-0 z-20 inline-flex items-start transition-transform duration-300 ease-in-out"
-        style={{
-          transform: isVisible
-            ? "translateX(0)"
-            : `translateX(calc(-1 * ${PANEL_WIDTH}))`,
-        }}
+      <motion.div
+        className="fixed top-44 left-0 z-20 inline-flex items-start"
+        initial={false}
+        animate={isVisible ? "open" : "closed"}
+        variants={containerVariants}
       >
         {/* Element Library Panel */}
         <div
@@ -268,19 +377,28 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
           {/* Elements Grid */}
           <div className="max-h-[calc(70vh-180px)] overflow-y-auto themed-scroll pr-1">
             {filteredElements.length > 0 ? (
-              <div className="grid gap-2">
+              <motion.div
+                className="grid gap-2"
+                variants={listVariants}
+                initial="hidden"
+                animate="show"
+                key={selectedCategory + searchQuery} // Re-animate when filter changes
+              >
                 {filteredElements.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <button
+                    <motion.button
                       key={item.type}
+                      variants={itemVariants}
+                      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+                      whileTap={{ scale: 0.98 }}
                       type="button"
                       draggable
-                      onDragStart={(e) => handleDragStart(e, item.type)}
+                      onDragStart={(e) => handleDragStart(e as any, item.type)}
                       onDragEnd={handleDragEnd}
                       onClick={() => handleAddElement(item.type)}
                       className={clsx(
-                        "group relative flex items-center gap-3 rounded-xl border border-[color:var(--panel-border)] bg-[color-mix(in_lab,var(--panel-bg)_95%,white)] px-3 py-3 text-left transition-all hover:border-[var(--accent)] hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]",
+                        "group relative flex items-center gap-3 rounded-xl border border-[color:var(--panel-border)] bg-[color-mix(in_lab,var(--panel-bg)_95%,white)] px-3 py-3 text-left transition-colors hover:border-[var(--accent)] hover:shadow-lg",
                         isDragging && "cursor-grabbing"
                       )}
                       aria-label={`Add ${item.label}`}
@@ -313,10 +431,10 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
 
                       {/* Hover Effect */}
                       <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[var(--accent)]/0 via-[var(--accent)]/5 to-[var(--accent)]/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                    </button>
+                    </motion.button>
                   );
                 })}
-              </div>
+              </motion.div>
             ) : (
               <div className="text-center py-12">
                 <Search
@@ -367,10 +485,9 @@ const FormAddElements: React.FC<FormAddElementsProps> = ({
             />
           )}
         </button>
-      </div>
+      </motion.div>
     </div>
   );
 };
 
 export default FormAddElements;
-

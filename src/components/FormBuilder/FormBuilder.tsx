@@ -17,6 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 
 import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 import FormAddElements, {
   ELEMENT_DRAG_TYPE,
@@ -352,7 +353,7 @@ const FormBuilder = () => {
               className={clsx(
                 "space-y-4 flex-1 overflow-auto rounded-xl transition-base",
                 (isPaletteDragActive || isPaletteHovering) &&
-                  "ring-2 ring-dashed ring-[var(--accent)] bg-[color-mix(in_lab,var(--panel-bg)_95%,white)]"
+                "ring-2 ring-dashed ring-[var(--accent)] bg-[color-mix(in_lab,var(--panel-bg)_95%,white)]"
               )}
               ref={builderScrollRef}
               onDragOver={handlePaletteDragOver}
@@ -369,43 +370,63 @@ const FormBuilder = () => {
                   items={elements.map((el) => el.id)}
                   strategy={verticalListSortingStrategy}
                 >
-                  {showDropHints ? (
-                    <div className="rounded-lg border-2 border-dashed border-[color:var(--panel-border)]/70 p-8 text-center themed-muted transition-base">
-                      <p className="mb-6 font-medium">
-                        No elements yet—start by adding one above or drag from
-                        the list.
-                      </p>
-                      <div className="grid gap-4 sm:grid-cols-3">
-                        {[
-                          { title: "Text Input", description: "Collect short answers" },
-                          { title: "Select", description: "Offer predefined choices" },
-                          { title: "Checkboxes", description: "Allow multi-select" },
-                        ].map(({ title, description }) => (
-                          <div
-                            key={title}
-                            className="rounded-lg border themed-card p-3 shadow-sm text-left transition-base"
-                          >
-                            <p className="text-sm font-semibold text-[var(--text-primary)]">
-                              {title}
-                            </p>
-                            <p className="text-xs themed-muted">
-                              {description}
-                            </p>
-                          </div>
+                  <AnimatePresence mode="wait">
+                    {showDropHints ? (
+                      <motion.div
+                        key="empty-state"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="rounded-lg border-2 border-dashed border-[color:var(--panel-border)]/70 p-8 text-center themed-muted transition-base"
+                      >
+                        <p className="mb-6 font-medium">
+                          No elements yet—start by adding one above or drag from
+                          the list.
+                        </p>
+                        <div className="grid gap-4 sm:grid-cols-3">
+                          {[
+                            { title: "Text Input", description: "Collect short answers" },
+                            { title: "Select", description: "Offer predefined choices" },
+                            { title: "Checkboxes", description: "Allow multi-select" },
+                          ].map(({ title, description }, idx) => (
+                            <motion.div
+                              key={title}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.1 + idx * 0.05 }}
+                              className="rounded-lg border themed-card p-3 shadow-sm text-left transition-base"
+                            >
+                              <p className="text-sm font-semibold text-[var(--text-primary)]">
+                                {title}
+                              </p>
+                              <p className="text-xs themed-muted">
+                                {description}
+                              </p>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="element-list"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="space-y-4"
+                      >
+                        {elements.map((element) => (
+                          <FormElements
+                            key={element.id}
+                            element={element}
+                            handlePropsChange={handlePropsChange}
+                            handleRemoveElement={handleRemoveElement}
+                            handleRemoveOption={handleRemoveOption}
+                          />
                         ))}
-                      </div>
-                    </div>
-                  ) : (
-                    elements.map((element) => (
-                      <FormElements
-                        key={element.id}
-                        element={element}
-                        handlePropsChange={handlePropsChange}
-                        handleRemoveElement={handleRemoveElement}
-                        handleRemoveOption={handleRemoveOption}
-                      />
-                    ))
-                  )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </SortableContext>
               </DndContext>
             </div>
@@ -413,19 +434,18 @@ const FormBuilder = () => {
         </div>
 
         {/* Resizer */}
+        <div
+          className="hidden lg:flex items-stretch px-1 cursor-col-resize select-none"
+          onMouseDown={() => setIsResizing(true)}
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize panels"
+        >
           <div
-            className="hidden lg:flex items-stretch px-1 cursor-col-resize select-none"
-            onMouseDown={() => setIsResizing(true)}
-            role="separator"
-            aria-orientation="vertical"
-            aria-label="Resize panels"
-          >
-            <div
-              className={`w-1 rounded-full transition-colors ${
-                isResizing ? "bg-[var(--accent)]" : "bg-[color:var(--panel-border)]"
+            className={`w-1 rounded-full transition-colors ${isResizing ? "bg-[var(--accent)]" : "bg-[color:var(--panel-border)]"
               }`}
-            />
-          </div>
+          />
+        </div>
 
         {/* Preview Section */}
         <div
